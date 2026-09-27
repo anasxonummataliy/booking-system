@@ -667,4 +667,27 @@ a {
   }
 }
 
+/* Horizontally scrollable pill filters */
+.filter-pills-scroll {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 100%;
+  min-width: 0;
+  padding-bottom: 4px;
+}
+
+.filter-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-pills-scroll .pill-filter {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 

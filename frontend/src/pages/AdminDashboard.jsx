@@ -1074,9 +1074,9 @@ export default function AdminDashboard({ onNavigate }) {
         {/* TAB 2: BOOKINGS MANAGEMENT */}
         {activeTab === 'bookings' && (
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
-            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', flexWrap: 'wrap', gap: '12px' }}>
               {/* Search bar */}
-              <div style={{ position: 'relative', width: '280px' }}>
+              <div style={{ position: 'relative', width: '280px', maxWidth: '100%', flex: '1 1 240px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
                 <input
                   type="text"
@@ -1094,7 +1094,21 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               {/* Status filter pills */}
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div
+                className="filter-pills-scroll"
+                style={{
+                  display: 'flex',
+                  gap: '5px',
+                  alignItems: 'center',
+                  overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  maxWidth: '100%',
+                  minWidth: 0,
+                  paddingBottom: '2px'
+                }}
+              >
                 {['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'].map(st => {
                   const label = st === 'All' ? t('filterAll') : (
                     st === 'Confirmed' ? t('statusConfirmed') : (
@@ -1108,7 +1122,12 @@ export default function AdminDashboard({ onNavigate }) {
                       key={st}
                       onClick={() => setFilterStatus(st)}
                       className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
-                      style={{ fontSize: '12px', padding: '6px 14px' }}
+                      style={{
+                        fontSize: '11px',
+                        padding: '5px 9px',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
                     >
                       {label}
                     </button>
