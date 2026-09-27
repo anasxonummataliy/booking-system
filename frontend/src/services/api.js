@@ -31,6 +31,8 @@ export const api = {
   register: (userData) => request('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
   login: (credentials) => request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   getCurrentUser: () => request('/auth/me'),
+  changePassword: (data) => request('/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
+  toggle2FA: (data) => request('/auth/toggle-2fa', { method: 'POST', body: JSON.stringify(data) }),
 
   // Services
   getServices: () => request('/services'),

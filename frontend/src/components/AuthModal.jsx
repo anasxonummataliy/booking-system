@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }) {
-  const { login, register, quickLoginAsAlex, quickLoginAsAdmin } = useAuth();
+  const { login, register, quickLoginAsAnasxon, quickLoginAsAdmin } = useAuth();
   const { t } = useLanguage();
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
   const [email, setEmail] = useState('');
@@ -39,8 +39,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
     setError('');
     setLoading(true);
     try {
-      if (type === 'alex') {
-        await quickLoginAsAlex();
+      if (type === 'user') {
+        await quickLoginAsAnasxon();
       } else if (type === 'admin') {
         await quickLoginAsAdmin();
       }
@@ -64,8 +64,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
               {mode === 'login' 
-                ? (t('loginSubtitle') || 'Access your appointments and records') 
-                : (t('registerSubtitle') || 'Join to book appointments in seconds')}
+                ? t('loginSubtitle')
+                : t('registerSubtitle')}
             </p>
           </div>
           <button
@@ -90,19 +90,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
             <button
               type="button"
-              onClick={() => handleDemo('alex')}
+              onClick={() => handleDemo('user')}
               className="btn-secondary"
-              style={{ fontSize: '12px', padding: '8px 10px', justifyContent: 'center' }}
+              style={{ fontSize: '12px', padding: '9px 10px', justifyContent: 'center', fontWeight: 600 }}
             >
-              👤 Patient (Alex)
+              👤 User (Anasxon)
             </button>
             <button
               type="button"
               onClick={() => handleDemo('admin')}
               className="btn-secondary"
-              style={{ fontSize: '12px', padding: '8px 10px', justifyContent: 'center' }}
+              style={{ fontSize: '12px', padding: '9px 10px', justifyContent: 'center', fontWeight: 600 }}
             >
-              🛠 Clinic Admin
+              🛠️ Admin
             </button>
           </div>
         </div>

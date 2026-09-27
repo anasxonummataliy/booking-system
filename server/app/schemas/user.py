@@ -26,6 +26,7 @@ class UserLogin(BaseModel):
 class UserOut(UserBase):
     id: int
     is_active: bool
+    two_factor_enabled: bool = False
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -39,3 +40,18 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str | None = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class Toggle2FARequest(BaseModel):
+    enabled: bool
+
+
+class MessageResponse(BaseModel):
+    message: str
+    two_factor_enabled: bool | None = None
+

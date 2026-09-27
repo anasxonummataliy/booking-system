@@ -11,11 +11,7 @@ export default function BottomNav({ activePage, setActivePage, onOpenAuth, onOpe
     if (!isAuthenticated) {
       onOpenAuth('login');
     } else {
-      if (onOpenDrawer) {
-        onOpenDrawer();
-      } else {
-        setActivePage('dashboard');
-      }
+      setActivePage('profile');
     }
   };
 

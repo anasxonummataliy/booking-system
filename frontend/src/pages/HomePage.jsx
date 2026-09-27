@@ -560,11 +560,11 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                   boxShadow: 'var(--shadow-sm)'
                 }}
               >
-                <div style={{ height: '160px', overflow: 'hidden' }}>
+                <div className="doctor-card-img-container">
                   <img
                     src={doc.avatar_url || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400"}
                     alt={doc.full_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    className="doctor-card-img"
                   />
                 </div>
                 <div style={{ padding: '16px' }}>

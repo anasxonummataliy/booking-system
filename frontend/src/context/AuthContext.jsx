@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
 
 
   // Quick 1-click Demo Switchers for convenience
-  const quickLoginAsAlex = () => login('alex@healthplus.com', 'password123');
+  const quickLoginAsAnasxon = () => login('anasxon@healthplus.com', 'password123');
   const quickLoginAsAdmin = () => login('admin@healthplus.com', 'admin123');
 
   return (
@@ -62,7 +62,8 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        quickLoginAsAlex,
+        quickLoginAsAnasxon,
+        quickLoginAsAlex: quickLoginAsAnasxon,
         quickLoginAsAdmin,
       }}
     >

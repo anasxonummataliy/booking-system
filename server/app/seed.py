@@ -46,17 +46,18 @@ def seed_database(force: bool = False):
         )
         db.add(admin_user)
 
-    alex_user = db.query(User).filter(User.email == "alex@healthplus.com").first()
-    if not alex_user:
-        alex_user = User(
-            email="alex@healthplus.com",
-            full_name="Alex Turner",
-            phone="+998909876543",
+    # Demo patient user
+    anasxon_user = db.query(User).filter(User.email.in_(["anasxon@healthplus.com", "alex@healthplus.com"])).first()
+    if not anasxon_user:
+        anasxon_user = User(
+            email="anasxon@healthplus.com",
+            full_name="Anasxon Ummataliyev",
+            phone="+998901234567",
             hashed_password=hash_password("password123"),
             role=UserRole.USER.value,
             is_active=True,
         )
-        db.add(alex_user)
+        db.add(anasxon_user)
 
     # Doctor user account
     nodira_user = db.query(User).filter(User.email == "nodira.karimova@healthplus.com").first()

@@ -157,10 +157,10 @@ export default function UserDashboard({ onNavigate }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="dashboard-main-content" style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
+      <main className="dashboard-main-content">
         {/* Welcome Header */}
-        <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)' }}>
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-main)' }}>
             {t('helloUser')}, {user?.full_name?.split(' ')[0] || 'Patient'}! 👋
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -169,17 +169,12 @@ export default function UserDashboard({ onNavigate }) {
         </div>
 
         {/* 4 KPI Stats Cards */}
-        <div className="kpi-grid-4" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '20px',
-          marginBottom: '32px'
-        }}>
+        <div className="kpi-grid-4">
           {/* Upcoming */}
           <div style={{
             backgroundColor: '#FFFFFF',
             borderRadius: 'var(--radius-lg)',
-            padding: '20px',
+            padding: '16px',
             border: '1px solid var(--border-light)',
             boxShadow: 'var(--shadow-sm)'
           }}>
@@ -189,7 +184,7 @@ export default function UserDashboard({ onNavigate }) {
                 <Calendar size={18} color="var(--primary)" />
               </div>
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)' }}>
               {upcomingBookings.length}
             </div>
           </div>
@@ -198,7 +193,7 @@ export default function UserDashboard({ onNavigate }) {
           <div style={{
             backgroundColor: '#FFFFFF',
             borderRadius: 'var(--radius-lg)',
-            padding: '20px',
+            padding: '16px',
             border: '1px solid var(--border-light)',
             boxShadow: 'var(--shadow-sm)'
           }}>
@@ -208,7 +203,7 @@ export default function UserDashboard({ onNavigate }) {
                 <CheckCircle size={18} color="#10B981" />
               </div>
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#10B981' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#10B981' }}>
               {completedBookings.length}
             </div>
           </div>
@@ -217,7 +212,7 @@ export default function UserDashboard({ onNavigate }) {
           <div style={{
             backgroundColor: '#FFFFFF',
             borderRadius: 'var(--radius-lg)',
-            padding: '20px',
+            padding: '16px',
             border: '1px solid var(--border-light)',
             boxShadow: 'var(--shadow-sm)'
           }}>
@@ -227,7 +222,7 @@ export default function UserDashboard({ onNavigate }) {
                 <XCircle size={18} color="#EF4444" />
               </div>
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#EF4444' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#EF4444' }}>
               {cancelledBookings.length}
             </div>
           </div>
@@ -236,7 +231,7 @@ export default function UserDashboard({ onNavigate }) {
           <div style={{
             backgroundColor: '#FFFFFF',
             borderRadius: 'var(--radius-lg)',
-            padding: '20px',
+            padding: '16px',
             border: '1px solid var(--border-light)',
             boxShadow: 'var(--shadow-sm)'
           }}>
@@ -246,7 +241,7 @@ export default function UserDashboard({ onNavigate }) {
                 <FileText size={18} color="var(--text-muted)" />
               </div>
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)' }}>
               {bookings.length}
             </div>
           </div>
@@ -254,7 +249,7 @@ export default function UserDashboard({ onNavigate }) {
 
         {/* Highlighted Upcoming Appointment Card */}
         {nextAppointment && (
-          <div style={{ marginBottom: '36px' }}>
+          <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>{t('upcomingAppointments')}</h3>
               <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }} onClick={() => setActiveTab('appointments')}>
@@ -262,30 +257,21 @@ export default function UserDashboard({ onNavigate }) {
               </span>
             </div>
 
-            <div style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 'var(--radius-xl)',
-              padding: '24px 28px',
-              border: '1px solid var(--border-light)',
-              boxShadow: 'var(--shadow-sm)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="upcoming-hero-card">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
                 <img
                   src={nextAppointment.doctor?.avatar_url || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200"}
                   alt={nextAppointment.doctor?.full_name}
-                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }}
+                  style={{ width: '56px', height: '56px', minWidth: '56px', borderRadius: '50%', objectFit: 'cover' }}
                 />
-                <div>
-                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '3px' }}>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '3px' }}>
                     {nextAppointment.doctor?.full_name}
                   </h4>
                   <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '6px' }}>
                     {nextAppointment.doctor?.specialty}
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
                       {formatDate(nextAppointment.start_time)}
                     </span>
@@ -299,6 +285,7 @@ export default function UserDashboard({ onNavigate }) {
                   onClick={() => handleCancel(nextAppointment.id)}
                   disabled={cancellingId === nextAppointment.id}
                   className="btn-danger-outline"
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   {cancellingId === nextAppointment.id ? '...' : t('cancel')}
                 </button>
@@ -335,48 +322,47 @@ export default function UserDashboard({ onNavigate }) {
               border: '1px solid var(--border-light)',
               overflow: 'hidden'
             }}>
-              {bookings.map((booking, idx) => (
+              {bookings.map((booking) => (
                 <div
                   key={booking.id}
-                  style={{
-                    padding: '18px 24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    borderBottom: idx === bookings.length - 1 ? 'none' : '1px solid var(--border-light)'
-                  }}
+                  className="appointment-item-card"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div className="appointment-item-top">
                     <img
                       src={booking.doctor?.avatar_url || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200"}
                       alt={booking.doctor?.full_name}
-                      style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
+                      style={{ width: '46px', height: '46px', minWidth: '46px', borderRadius: '50%', objectFit: 'cover' }}
                     />
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <h5 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main)' }}>
-                          {booking.doctor?.full_name}
-                        </h5>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>•</span>
-                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{booking.doctor?.specialty}</span>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h5 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '2px' }}>
+                        {booking.doctor?.full_name}
+                      </h5>
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                        {booking.doctor?.specialty}
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      <div className="mobile-only" style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
                         {formatDate(booking.start_time)}
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {renderStatusBadge(booking.status)}
-                    {(booking.status === 'Confirmed' || booking.status === 'Pending') && (
-                      <button
-                        onClick={() => handleCancel(booking.id)}
-                        disabled={cancellingId === booking.id}
-                        className="btn-danger-outline"
-                      >
-                        {cancellingId === booking.id ? '...' : t('cancel')}
-                      </button>
-                    )}
+                  <div className="appointment-item-bottom">
+                    <div className="desktop-only" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                      {formatDate(booking.start_time)}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {renderStatusBadge(booking.status)}
+                      {(booking.status === 'Confirmed' || booking.status === 'Pending') && (
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          disabled={cancellingId === booking.id}
+                          className="btn-danger-outline"
+                          style={{ padding: '6px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                        >
+                          {cancellingId === booking.id ? '...' : t('cancel')}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

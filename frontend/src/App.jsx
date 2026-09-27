@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
@@ -12,10 +12,12 @@ import DoctorsPage from './pages/DoctorsPage';
 import DoctorBookingPage from './pages/DoctorBookingPage';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
+  const { isAuthenticated, isAdmin } = useAuth();
   
-  // Page navigation state: 'home' | 'services' | 'doctors' | 'doctor-booking' | 'dashboard' | 'admin'
+  // Page navigation state: 'home' | 'services' | 'doctors' | 'doctor-booking' | 'dashboard' | 'profile' | 'admin'
   const [activePage, setActivePage] = useState('home');
   
   // Doctor booking state
@@ -48,6 +50,11 @@ function AppContent() {
     setConfirmedBooking(booking);
     setConfirmationModalOpen(true);
   };
+
+  // If authenticated as admin, ONLY show AdminDashboard (no patient navbar/bottom nav/drawer)
+  if (isAuthenticated && isAdmin) {
+    return <AdminDashboard onNavigate={setActivePage} />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -97,6 +104,12 @@ function AppContent() {
           <UserDashboard
             onNavigate={setActivePage}
             onSelectDoctor={handleSelectDoctor}
+          />
+        )}
+
+        {activePage === 'profile' && (
+          <ProfilePage
+            onNavigate={setActivePage}
           />
         )}
 

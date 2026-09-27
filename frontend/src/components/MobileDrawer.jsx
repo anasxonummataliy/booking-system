@@ -9,7 +9,8 @@ import {
   LogIn,
   X,
   Plus,
-  Globe
+  Globe,
+  User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -73,15 +74,19 @@ export default function MobileDrawer({ isOpen, onClose, activePage, setActivePag
 
         {/* User Card if logged in */}
         {isAuthenticated && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            backgroundColor: '#1E293B',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 14px',
-            marginBottom: '22px'
-          }}>
+          <div 
+            onClick={() => handleNavigate('profile')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              backgroundColor: '#1E293B',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              marginBottom: '22px',
+              cursor: 'pointer'
+            }}
+          >
             <div style={{
               width: '40px',
               height: '40px',
@@ -96,18 +101,18 @@ export default function MobileDrawer({ isOpen, onClose, activePage, setActivePag
             }}>
               {user?.full_name?.charAt(0) || 'U'}
             </div>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {user?.full_name}
               </div>
-              <div style={{ fontSize: '11px', color: '#94A3B8' }}>
+              <div style={{ fontSize: '11px', color: '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {user?.email}
               </div>
             </div>
           </div>
         )}
 
-        {/* Navigation Links matching Screen 12 */}
+        {/* Navigation Links */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button
             onClick={() => handleNavigate('home')}
@@ -127,6 +132,27 @@ export default function MobileDrawer({ isOpen, onClose, activePage, setActivePag
             <Home size={19} />
             <span>{t('navHome')}</span>
           </button>
+
+          {isAuthenticated && (
+            <button
+              onClick={() => handleNavigate('profile')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '15px',
+                fontWeight: activePage === 'profile' ? 700 : 500,
+                color: activePage === 'profile' ? '#FFFFFF' : '#94A3B8',
+                backgroundColor: activePage === 'profile' ? 'var(--primary)' : 'transparent',
+                textAlign: 'left'
+              }}
+            >
+              <User size={19} />
+              <span>{t('bottomNavProfile')}</span>
+            </button>
+          )}
 
           <button
             onClick={() => {

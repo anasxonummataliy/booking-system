@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Plus, LogOut, LayoutDashboard, Shield, Calendar, Menu } from 'lucide-react';
+import { Plus, LogOut, LayoutDashboard, Shield, Calendar, Menu, User } from 'lucide-react';
 
 export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDrawer }) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -200,6 +200,23 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
                   padding: '8px',
                   zIndex: 200
                 }}>
+                  <button
+                    onClick={() => { setActivePage('profile'); setDropdownOpen(false); }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      fontSize: '14px',
+                      color: 'var(--text-main)',
+                      borderRadius: 'var(--radius-sm)',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <User size={16} color="var(--primary)" /> {t('bottomNavProfile')}
+                  </button>
+
                   <button
                     onClick={() => { setActivePage('dashboard'); setDropdownOpen(false); }}
                     style={{
