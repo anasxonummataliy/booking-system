@@ -257,6 +257,7 @@ export const translations = {
     navAdmin: 'Admin Dashboard',
     navLogin: 'Sign In',
     navRegister: 'Sign Up',
+    navLogout: 'Sign Out',
     quickDemoAnasxon: 'User (Anasxon)',
     quickDemoAdmin: 'Admin',
     language: 'Language',

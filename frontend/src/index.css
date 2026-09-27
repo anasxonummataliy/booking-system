@@ -599,15 +599,72 @@ a {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
 }
 
+/* Admin Dashboard Fixed / Responsive Layout */
+.admin-layout-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-page);
+}
+
+.admin-body-container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.admin-desktop-sidebar {
+  width: 260px;
+  background-color: #0B132B;
+  color: #FFFFFF;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid #1E293B;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0B132B;
+}
+
+.admin-desktop-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-desktop-sidebar::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 4px;
+}
+
 .admin-workspace {
   flex: 1;
-  padding: 32px 36px;
+  height: 100%;
   overflow-y: auto;
+  min-width: 0;
+  padding: 32px 36px;
 }
 
 @media (max-width: 768px) {
+  .admin-layout-root {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .admin-body-container {
+    overflow: visible;
+    flex-direction: column;
+  }
+
   .admin-workspace {
+    height: auto;
+    overflow: visible;
     padding: 16px 14px 40px !important;
   }
 }
+
 

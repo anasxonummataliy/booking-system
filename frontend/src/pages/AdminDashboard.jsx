@@ -299,7 +299,7 @@ export default function AdminDashboard({ onNavigate }) {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-page)' }}>
+    <div className="admin-layout-root">
       {/* Top Admin Header Bar */}
       <header style={{
         backgroundColor: '#0B132B',
@@ -312,6 +312,7 @@ export default function AdminDashboard({ onNavigate }) {
         position: 'sticky',
         top: 0,
         zIndex: 50,
+        flexShrink: 0,
         boxShadow: 'var(--shadow-sm)'
       }}>
         {/* Brand */}
@@ -463,18 +464,9 @@ export default function AdminDashboard({ onNavigate }) {
       </div>
 
       {/* Admin Content Area (Sidebar + Workspace) */}
-      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <div className="admin-body-container">
         {/* Sleek Custom Admin Sidebar (Desktop) */}
-        <aside className="desktop-only" style={{
-          width: '260px',
-          backgroundColor: '#0B132B',
-          color: '#FFFFFF',
-          padding: '24px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          flexShrink: 0
-        }}>
+        <aside className="desktop-only admin-desktop-sidebar">
         <div>
           {/* Logo & Admin Badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', paddingLeft: '8px' }}>
@@ -650,11 +642,11 @@ export default function AdminDashboard({ onNavigate }) {
         </div>
 
         {/* Admin user info & Logout */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 0', borderTop: '1px solid #1E293B', marginBottom: '8px' }}>
+        <div style={{ flexShrink: 0, paddingTop: '16px', borderTop: '1px solid #1E293B' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               backgroundColor: 'var(--primary)',
               display: 'flex',
@@ -662,29 +654,44 @@ export default function AdminDashboard({ onNavigate }) {
               justifyContent: 'center',
               fontWeight: 800,
               fontSize: '14px',
-              color: '#FFFFFF'
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)',
+              flexShrink: 0
             }}>
-              A
+              {(user?.full_name || 'Admin')[0].toUpperCase()}
             </div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 700 }}>Admin HealthPlus</div>
-              <div style={{ fontSize: '11px', color: '#94A3B8' }}>admin@healthplus.com</div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {user?.full_name || 'Admin HealthPlus'}
+              </div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {user?.email || 'admin@healthplus.uz'}
+              </div>
             </div>
           </div>
           <button
-            onClick={logout}
+            onClick={() => {
+              if (window.confirm(t('logoutConfirm'))) {
+                logout();
+              }
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              padding: '8px 0',
+              gap: '8px',
+              padding: '8px 10px',
+              borderRadius: 'var(--radius-sm)',
               color: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
               fontSize: '13px',
               fontWeight: 600,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              border: 'none',
+              width: '100%',
+              transition: 'all 0.2s ease'
             }}
           >
-            <LogOut size={16} /> {t('navLogout')}
+            <LogOut size={15} /> {t('navLogout')}
           </button>
         </div>
       </aside>
@@ -1313,6 +1320,67 @@ export default function AdminDashboard({ onNavigate }) {
             </div>
           </div>
         )}
+
+        {/* Mobile-only Admin Info & Logout Footer Card */}
+        <div className="mobile-only" style={{
+          marginTop: '36px',
+          padding: '16px',
+          backgroundColor: '#0B132B',
+          borderRadius: 'var(--radius-lg)',
+          color: '#FFFFFF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: 'var(--shadow-md)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '14px',
+              color: '#FFFFFF'
+            }}>
+              {(user?.full_name || 'Admin')[0].toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
+                {user?.full_name || 'Admin HealthPlus'}
+              </div>
+              <div style={{ fontSize: '11px', color: '#94A3B8' }}>
+                {user?.email || 'admin@healthplus.uz'}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              if (window.confirm(t('logoutConfirm'))) {
+                logout();
+              }
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 12px',
+              backgroundColor: '#EF4444',
+              color: '#FFFFFF',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '12px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <LogOut size={14} />
+            <span>{t('navLogout')}</span>
+          </button>
+        </div>
       </main>
       </div>
 
