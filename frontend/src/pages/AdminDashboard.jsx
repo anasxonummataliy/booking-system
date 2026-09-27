@@ -1074,9 +1074,9 @@ export default function AdminDashboard({ onNavigate }) {
         {/* TAB 2: BOOKINGS MANAGEMENT */}
         {activeTab === 'bookings' && (
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
-            <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', flexWrap: 'wrap', gap: '12px' }}>
+            <div className="admin-card-header">
               {/* Search bar */}
-              <div style={{ position: 'relative', width: '280px', maxWidth: '100%', flex: '1 1 240px' }}>
+              <div style={{ position: 'relative', width: '280px', maxWidth: '100%', flex: '1 1 220px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
                 <input
                   type="text"
@@ -1098,7 +1098,7 @@ export default function AdminDashboard({ onNavigate }) {
                 className="filter-pills-scroll"
                 style={{
                   display: 'flex',
-                  gap: '5px',
+                  gap: '4px',
                   alignItems: 'center',
                   overflowX: 'auto',
                   WebkitOverflowScrolling: 'touch',
@@ -1123,8 +1123,8 @@ export default function AdminDashboard({ onNavigate }) {
                       onClick={() => setFilterStatus(st)}
                       className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
                       style={{
-                        fontSize: '11px',
-                        padding: '5px 9px',
+                        fontSize: '10.5px',
+                        padding: '5px 8px',
                         whiteSpace: 'nowrap',
                         flexShrink: 0
                       }}

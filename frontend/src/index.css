@@ -667,6 +667,23 @@ a {
   }
 }
 
+.admin-card-header {
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .admin-card-header {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+}
+
 /* Horizontally scrollable pill filters */
 .filter-pills-scroll {
   display: flex;
