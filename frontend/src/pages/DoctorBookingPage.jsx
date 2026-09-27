@@ -197,7 +197,7 @@ export default function DoctorBookingPage({
         </div>
 
         {/* 2-Column Booking Layout */}
-        <div style={{
+        <div className="grid-responsive-2" style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1.25fr',
           gap: '32px',

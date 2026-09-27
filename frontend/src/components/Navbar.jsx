@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Plus, LogOut, LayoutDashboard, Shield, Calendar } from 'lucide-react';
+import { Plus, LogOut, LayoutDashboard, Shield, Calendar, Menu } from 'lucide-react';
 
-export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
+export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDrawer }) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -21,32 +21,37 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '76px'
+        height: '70px'
       }}>
-        {/* Brand Logo */}
+        {/* Brand Logo matching Mockup */}
         <div
           onClick={() => setActivePage('home')}
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
         >
           <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
+            width: '34px',
+            height: '34px',
+            borderRadius: '9px',
             backgroundColor: '#EFF6FF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             border: '1.5px solid var(--primary)'
           }}>
-            <Plus size={22} color="var(--primary)" strokeWidth={3} />
+            <Plus size={20} color="var(--primary)" strokeWidth={3} />
           </div>
-          <span style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
-            {t('appName')}<span style={{ color: 'var(--primary)' }}>{t('appNameAccent')}</span>
-          </span>
+          <div>
+            <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+              {t('appName')}<span style={{ color: 'var(--primary)' }}>{t('appNameAccent')}</span>
+            </span>
+            <div style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1, marginTop: '-2px' }}>
+              {t('tagline')}
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+        {/* Desktop Navigation Links */}
+        <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           {[
             { id: 'home', label: t('navHome') },
             { id: 'services', label: t('navServices') },
@@ -94,14 +99,14 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
         </nav>
 
         {/* Right CTA / Language Switcher / Profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {/* Language Switcher Pill */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             backgroundColor: '#F1F5F9',
             borderRadius: 'var(--radius-full)',
-            padding: '3px',
+            padding: '2px',
             border: '1px solid var(--border-light)'
           }}>
             <button
@@ -109,15 +114,14 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
-                padding: '5px 10px',
+                gap: '3px',
+                padding: '4px 8px',
                 borderRadius: 'var(--radius-full)',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: language === 'uz' ? 700 : 500,
                 backgroundColor: language === 'uz' ? '#FFFFFF' : 'transparent',
                 color: language === 'uz' ? 'var(--primary)' : 'var(--text-muted)',
                 boxShadow: language === 'uz' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s',
                 cursor: 'pointer'
               }}
               title="O'zbekcha"
@@ -129,15 +133,14 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
-                padding: '5px 10px',
+                gap: '3px',
+                padding: '4px 8px',
                 borderRadius: 'var(--radius-full)',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: language === 'en' ? 700 : 500,
                 backgroundColor: language === 'en' ? '#FFFFFF' : 'transparent',
                 color: language === 'en' ? 'var(--primary)' : 'var(--text-muted)',
                 boxShadow: language === 'en' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s',
                 cursor: 'pointer'
               }}
               title="English"
@@ -153,16 +156,16 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  padding: '6px 12px',
+                  gap: '8px',
+                  padding: '5px 10px',
                   borderRadius: 'var(--radius-full)',
                   border: '1px solid var(--border-light)',
                   backgroundColor: '#FFFFFF'
                 }}
               >
                 <div style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '30px',
+                  height: '30px',
                   borderRadius: '50%',
                   backgroundColor: 'var(--primary-light)',
                   color: 'var(--primary)',
@@ -170,15 +173,15 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 700,
-                  fontSize: '14px'
+                  fontSize: '13px'
                 }}>
                   {user?.full_name?.charAt(0) || 'U'}
                 </div>
-                <div style={{ textAlign: 'left', lineHeight: 1.2 }}>
+                <div className="desktop-nav" style={{ textAlign: 'left', lineHeight: 1.2 }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-main)', display: 'block' }}>
                     {user?.full_name}
                   </span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
                     {user?.role}
                   </span>
                 </div>
@@ -210,8 +213,6 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                       borderRadius: 'var(--radius-sm)',
                       textAlign: 'left'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     <Calendar size={16} color="var(--primary)" /> {t('navAppointments')}
                   </button>
@@ -230,8 +231,6 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                         borderRadius: 'var(--radius-sm)',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
                       <LayoutDashboard size={16} color="#4338CA" /> {t('navAdmin')}
                     </button>
@@ -252,8 +251,6 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                       borderRadius: 'var(--radius-sm)',
                       textAlign: 'left'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--danger-bg)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     <LogOut size={16} /> {t('navLogout')}
                   </button>
@@ -261,12 +258,12 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
               )}
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button
                 onClick={() => onOpenAuth('login')}
                 style={{
-                  padding: '9px 18px',
-                  fontSize: '14px',
+                  padding: '8px 14px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   color: 'var(--text-main)'
                 }}
@@ -276,12 +273,30 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
               <button
                 onClick={() => onOpenAuth('register')}
                 className="btn-primary"
-                style={{ padding: '9px 20px', borderRadius: 'var(--radius-md)' }}
+                style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '13px' }}
               >
                 {t('navRegister')}
               </button>
             </div>
           )}
+
+          {/* Mobile Hamburger Menu Toggle Button */}
+          <button
+            onClick={onOpenDrawer}
+            className="mobile-nav-toggle"
+            style={{
+              padding: '6px',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-main)',
+              backgroundColor: '#F1F5F9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Open mobile menu"
+          >
+            <Menu size={22} />
+          </button>
         </div>
       </div>
     </header>

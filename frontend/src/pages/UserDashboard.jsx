@@ -74,8 +74,8 @@ export default function UserDashboard({ onNavigate }) {
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 76px)', backgroundColor: 'var(--bg-page)' }}>
-      {/* Dark Left Sidebar */}
-      <aside style={{
+      {/* Dark Left Sidebar - Hidden on mobile in favor of bottom nav & drawer */}
+      <aside className="desktop-nav" style={{
         width: '260px',
         backgroundColor: '#0F172A',
         color: '#FFFFFF',
@@ -159,19 +159,19 @@ export default function UserDashboard({ onNavigate }) {
       </aside>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
+      <main className="dashboard-main-content" style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
         {/* Welcome Header */}
         <div style={{ marginBottom: '28px' }}>
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)' }}>
-            Welcome back, {user?.full_name?.split(' ')[0] || 'Patient'}! 👋
+            {t('helloUser')}, {user?.full_name?.split(' ')[0] || 'Patient'}! 👋
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Here's your personal health and appointments overview
+            {t('userDashboardSubtitle')}
           </p>
         </div>
 
         {/* 4 KPI Stats Cards */}
-        <div style={{
+        <div className="kpi-grid-4" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '20px',

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
+import MobileDrawer from './components/MobileDrawer';
 import AuthModal from './components/AuthModal';
 import BookingConfirmationModal from './components/BookingConfirmationModal';
 import HomePage from './pages/HomePage';
@@ -20,7 +22,8 @@ function AppContent() {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedBookingDate, setSelectedBookingDate] = useState(null);
   
-  // Modals state
+  // Modals & Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login');
   const [confirmedBooking, setConfirmedBooking] = useState(null);
@@ -53,6 +56,7 @@ function AppContent() {
         onOpenAuth={handleOpenAuth}
         activePage={activePage}
         setActivePage={setActivePage}
+        onOpenDrawer={() => setDrawerOpen(true)}
       />
 
       {/* Main Pages */}
@@ -103,7 +107,22 @@ function AppContent() {
         )}
       </main>
 
-      {/* Modals */}
+      {/* Modals & Drawers */}
+      <BottomNav
+        activePage={activePage}
+        setActivePage={setActivePage}
+        onOpenAuth={handleOpenAuth}
+        onOpenDrawer={() => setDrawerOpen(true)}
+      />
+
+      <MobileDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        activePage={activePage}
+        setActivePage={setActivePage}
+        onOpenAuth={handleOpenAuth}
+      />
+
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}

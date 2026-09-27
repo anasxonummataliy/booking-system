@@ -28,6 +28,26 @@ export const translations = {
     reviews: 'ta sharh',
     experience: 'yil tajriba',
 
+    // Mobile & App Navigation
+    bottomNavHome: 'Bosh sahifa',
+    bottomNavAppointments: 'Qabullar',
+    bottomNavDoctors: 'Shifokorlar',
+    bottomNavProfile: 'Profil',
+    quickActionBook: 'Qabulga yozilish',
+    quickActionAppointments: 'Mening qabullarim',
+    quickActionDoctors: 'Shifokorlar',
+    quickActionServices: 'Xizmatlar',
+    greetingSubtitle: 'Salomatligingizga e‘tiborli bo‘ling. Biz siz uchun shu yerdamiz.',
+    helloUser: 'Salom',
+    searchPlaceholderMobile: 'Shifokorlar, xizmatlarni qidirish...',
+    tabUpcoming: 'Kelgusi',
+    tabPast: 'O‘tgan',
+    viewSchedule: 'Qabul vaqtlari',
+    getStarted: 'Boshlash',
+    welcomeBack: 'Qaytib kelganingizdan xursandmiz',
+    welcomeSubtitle: 'Davom etish uchun profilingizga kiring',
+    tagline: 'Sizning salomatligingiz — bizning ustuvor maqsadimiz',
+
     // Home Page
     heroBadge: "Sog'liqni saqlash xizmati",
     heroTitle: "Shifokor qabuliga onlayn ",
@@ -208,6 +228,26 @@ export const translations = {
     mins: 'mins',
     reviews: 'reviews',
     experience: 'yrs exp',
+
+    // Mobile & App Navigation
+    bottomNavHome: 'Home',
+    bottomNavAppointments: 'Appointments',
+    bottomNavDoctors: 'Doctors',
+    bottomNavProfile: 'Profile',
+    quickActionBook: 'Book Appointment',
+    quickActionAppointments: 'My Appointments',
+    quickActionDoctors: 'Doctors',
+    quickActionServices: 'Services',
+    greetingSubtitle: "Take care of your health. We're here for you.",
+    helloUser: 'Hello',
+    searchPlaceholderMobile: 'Search doctors, services...',
+    tabUpcoming: 'Upcoming',
+    tabPast: 'Past',
+    viewSchedule: 'View Schedule',
+    getStarted: 'Get Started',
+    welcomeBack: 'Welcome Back',
+    welcomeSubtitle: 'Log in to your account to continue',
+    tagline: 'Your Health, Our Priority',
 
     // Home Page
     heroBadge: 'Healthcare Service',

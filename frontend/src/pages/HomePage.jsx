@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
   Stethoscope,
@@ -9,16 +10,22 @@ import {
   Search,
   ArrowRight,
   ShieldCheck,
-  Star
+  Star,
+  Calendar,
+  ClipboardList,
+  Users,
+  Briefcase
 } from 'lucide-react';
 
 export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }) {
-  const { t } = useLanguage();
+  const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedServiceId, setSelectedServiceId] = useState('');
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -27,8 +34,8 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
           api.getServices(),
           api.getDoctors()
         ]);
-        setServices(servicesRes);
-        setDoctors(doctorsRes);
+        setServices(servicesRes || []);
+        setDoctors(doctorsRes || []);
       } catch (err) {
         console.error("Failed to fetch initial home data:", err);
       }
@@ -47,20 +54,190 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
     }
   };
 
+  const handleMobileSearch = (e) => {
+    e.preventDefault();
+    if (!mobileSearchQuery.trim()) {
+      onNavigate('doctors');
+      return;
+    }
+    const q = mobileSearchQuery.toLowerCase();
+    const matchedDoc = doctors.find(d => 
+      d.full_name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q)
+    );
+    if (matchedDoc) {
+      onSelectDoctor(matchedDoc);
+    } else {
+      onNavigate('doctors');
+    }
+  };
+
   // Service icon helper
   const renderServiceIcon = (iconName) => {
     switch (iconName) {
-      case 'heart': return <Heart size={26} color="#EF4444" />;
-      case 'baby': return <Baby size={26} color="#10B981" />;
-      case 'droplet': return <Activity size={26} color="#F59E0B" />;
-      default: return <Stethoscope size={26} color="var(--primary)" />;
+      case 'heart': return <Heart size={24} color="#EF4444" />;
+      case 'baby': return <Baby size={24} color="#10B981" />;
+      case 'droplet': return <Activity size={24} color="#F59E0B" />;
+      default: return <Stethoscope size={24} color="var(--primary)" />;
     }
   };
 
   return (
-    <div>
-      {/* HERO SECTION */}
-      <section style={{
+    <div style={{ paddingBottom: '30px' }}>
+      {/* ==============================================
+          MOBILE-SPECIFIC HERO & GREETING (Screens <= 768px)
+          Matches Screen 3 in uploaded UI mockup
+          ============================================== */}
+      <div className="mobile-only" style={{ padding: '20px 16px 8px' }}>
+        {/* User Greeting */}
+        <div style={{ marginBottom: '16px' }}>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+            {t('helloUser')}, {user?.full_name?.split(' ')[0] || (language === 'uz' ? 'Mehmon' : 'Guest')}! 👋
+          </h2>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            {t('greetingSubtitle')}
+          </p>
+        </div>
+
+        {/* Mobile Search Input */}
+        <form onSubmit={handleMobileSearch} style={{ position: 'relative', marginBottom: '18px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '14px', top: '13px', color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            placeholder={t('searchPlaceholderMobile')}
+            value={mobileSearchQuery}
+            onChange={(e) => setMobileSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 14px 12px 42px',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-light)',
+              backgroundColor: '#FFFFFF',
+              fontSize: '14px',
+              boxShadow: 'var(--shadow-sm)'
+            }}
+          />
+        </form>
+
+        {/* Mobile Promo Banner Card (Matches Screen 3) */}
+        <div style={{
+          background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+          borderRadius: 'var(--radius-xl)',
+          padding: '18px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '22px',
+          border: '1px solid #BFDBFE',
+          boxShadow: 'var(--shadow-sm)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{ maxWidth: '65%' }}>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              color: 'var(--primary)',
+              backgroundColor: '#FFFFFF',
+              padding: '3px 8px',
+              borderRadius: '10px',
+              display: 'inline-block',
+              marginBottom: '6px'
+            }}>
+              {t('heroBadge')}
+            </span>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.25, marginBottom: '4px' }}>
+              {t('tagline')}
+            </h3>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.3 }}>
+              {language === 'uz' ? 'Eng ishonchli va malakali shifokorlar xizmati' : 'Quality care from verified medical professionals'}
+            </p>
+          </div>
+          <div style={{
+            width: '68px',
+            height: '68px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+          }}>
+            <img
+              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200"
+              alt="Doctor"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        </div>
+
+        {/* 4 Quick Actions Grid (Matches Screen 3) */}
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '12px' }}>
+            {language === 'uz' ? 'Tezkor amallar' : 'Quick Actions'}
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '10px'
+          }}>
+            {/* Action 1: Book Appointment */}
+            <div
+              onClick={() => onNavigate('doctors')}
+              className="quick-action-card"
+            >
+              <div className="quick-action-icon" style={{ backgroundColor: '#EFF6FF', color: 'var(--primary)' }}>
+                <Calendar size={22} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>
+                {t('quickActionBook')}
+              </span>
+            </div>
+
+            {/* Action 2: My Appointments */}
+            <div
+              onClick={() => onNavigate('dashboard')}
+              className="quick-action-card"
+            >
+              <div className="quick-action-icon" style={{ backgroundColor: '#ECFDF5', color: '#059669' }}>
+                <ClipboardList size={22} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>
+                {t('quickActionAppointments')}
+              </span>
+            </div>
+
+            {/* Action 3: Doctors */}
+            <div
+              onClick={() => onNavigate('doctors')}
+              className="quick-action-card"
+            >
+              <div className="quick-action-icon" style={{ backgroundColor: '#F5F3FF', color: '#7C3AED' }}>
+                <Users size={22} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>
+                {t('quickActionDoctors')}
+              </span>
+            </div>
+
+            {/* Action 4: Services */}
+            <div
+              onClick={() => onNavigate('services')}
+              className="quick-action-card"
+            >
+              <div className="quick-action-icon" style={{ backgroundColor: '#FFFBEB', color: '#D97706' }}>
+                <Briefcase size={22} />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>
+                {t('quickActionServices')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ==============================================
+          DESKTOP HERO SECTION (Screens > 768px)
+          ============================================== */}
+      <section className="desktop-nav" style={{
         background: 'linear-gradient(180deg, #F0F7FF 0%, #FFFFFF 100%)',
         padding: '50px 0 70px',
         borderBottom: '1px solid var(--border-light)'
@@ -90,7 +267,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
               </div>
 
               <h1 style={{
-                fontSize: '48px',
+                fontSize: '46px',
                 fontWeight: 800,
                 lineHeight: 1.15,
                 color: 'var(--text-main)',
@@ -102,7 +279,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
               </h1>
 
               <p style={{
-                fontSize: '17px',
+                fontSize: '16px',
                 color: 'var(--text-muted)',
                 lineHeight: 1.6,
                 maxWidth: '520px',
@@ -211,7 +388,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
               <div style={{
                 position: 'relative',
                 width: '100%',
-                maxWidth: '440px',
+                maxWidth: '420px',
                 borderRadius: 'var(--radius-xl)',
                 overflow: 'hidden',
                 boxShadow: 'var(--shadow-xl)',
@@ -220,7 +397,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 <img
                   src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800"
                   alt="Doctor with Stethoscope"
-                  style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }}
+                  style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }}
                 />
                 {/* Floating badge on doctor */}
                 <div style={{
@@ -258,13 +435,15 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
         </div>
       </section>
 
-      {/* POPULAR SERVICES SECTION */}
-      <section style={{ padding: '60px 0 80px' }}>
+      {/* ==============================================
+          POPULAR SERVICES SECTION (Both Desktop & Mobile)
+          ============================================== */}
+      <section style={{ padding: '36px 0 40px' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>{t('popularServicesTitle')}</h2>
-              <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)' }}>{t('popularServicesTitle')}</h2>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
                 {t('popularServicesSubtitle')}
               </p>
             </div>
@@ -273,70 +452,60 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
               style={{
                 color: 'var(--primary)',
                 fontWeight: 700,
-                fontSize: '15px',
+                fontSize: '13px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '4px'
               }}
             >
-              {t('viewAllServices')} <ArrowRight size={16} />
+              {t('viewAllServices')} <ArrowRight size={14} />
             </button>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: '20px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+            gap: '16px'
           }}>
-            {services.map(service => (
+            {services.slice(0, 4).map(service => (
               <div
                 key={service.id}
                 onClick={() => onSelectService(service.id)}
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '24px',
+                  padding: '20px 16px',
                   border: '1px solid var(--border-light)',
                   boxShadow: 'var(--shadow-sm)',
                   textAlign: 'center',
                   cursor: 'pointer',
-                  transition: 'all 0.25s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                  e.currentTarget.style.borderColor = 'var(--primary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <div style={{
-                  width: '56px',
-                  height: '56px',
+                  width: '50px',
+                  height: '50px',
                   borderRadius: '50%',
                   backgroundColor: '#EFF6FF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 16px'
+                  margin: '0 auto 12px'
                 }}>
                   {renderServiceIcon(service.icon)}
                 </div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
                   {service.name}
                 </h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px', lineHeight: 1.4 }}>
-                  {service.description}
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.4 }}>
+                  {service.description?.slice(0, 50)}...
                 </p>
                 <div style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 700,
                   color: 'var(--primary)',
                   backgroundColor: '#F8FAFC',
-                  padding: '6px 12px',
+                  padding: '5px 10px',
                   borderRadius: 'var(--radius-full)',
                   display: 'inline-block'
                 }}>
@@ -348,13 +517,15 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
         </div>
       </section>
 
-      {/* FEATURED DOCTORS SPOTLIGHT */}
-      <section style={{ backgroundColor: '#F8FAFC', padding: '60px 0 80px', borderTop: '1px solid var(--border-light)' }}>
+      {/* ==============================================
+          FEATURED DOCTORS SPOTLIGHT (Both Desktop & Mobile)
+          ============================================== */}
+      <section style={{ backgroundColor: '#F8FAFC', padding: '36px 0 50px', borderTop: '1px solid var(--border-light)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>{t('topDoctorsTitle')}</h2>
-              <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)' }}>{t('topDoctorsTitle')}</h2>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
                 {t('topDoctorsSubtitle')}
               </p>
             </div>
@@ -363,20 +534,20 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
               style={{
                 color: 'var(--primary)',
                 fontWeight: 700,
-                fontSize: '15px',
+                fontSize: '13px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '4px'
               }}
             >
-              {t('viewAllDoctors')} <ArrowRight size={16} />
+              {t('viewAllDoctors')} <ArrowRight size={14} />
             </button>
           </div>
 
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '24px'
+            gap: '18px'
           }}>
             {doctors.slice(0, 3).map(doc => (
               <div
@@ -389,35 +560,35 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                   boxShadow: 'var(--shadow-sm)'
                 }}
               >
-                <div style={{ height: '180px', overflow: 'hidden' }}>
+                <div style={{ height: '160px', overflow: 'hidden' }}>
                   <img
                     src={doc.avatar_url || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400"}
                     alt={doc.full_name}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>
-                <div style={{ padding: '20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)' }}>{doc.specialty}</span>
-                    <span style={{ fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', color: '#D97706' }}>
-                      <Star size={14} fill="#D97706" /> {doc.rating}
+                <div style={{ padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)' }}>{doc.specialty}</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '3px', color: '#D97706' }}>
+                      <Star size={13} fill="#D97706" /> {doc.rating}
                     </span>
                   </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '6px' }}>
                     {doc.full_name}
                   </h3>
-                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: '16px' }}>
-                    {doc.bio?.slice(0, 85)}...
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4, marginBottom: '14px' }}>
+                    {doc.bio?.slice(0, 75)}...
                   </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
                     <div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>{t('consultationFee')}</span>
-                      <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>${doc.consultation_fee}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block' }}>{t('consultationFee')}</span>
+                      <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-main)' }}>${doc.consultation_fee}</span>
                     </div>
                     <button
                       onClick={() => onSelectDoctor(doc)}
                       className="btn-primary"
-                      style={{ padding: '8px 16px', fontSize: '13px' }}
+                      style={{ padding: '7px 14px', fontSize: '12px' }}
                     >
                       {t('bookAppointmentBtn')}
                     </button>

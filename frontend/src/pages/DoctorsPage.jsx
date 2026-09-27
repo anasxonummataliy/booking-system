@@ -131,38 +131,41 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '20px 24px',
+                  padding: '18px 20px',
                   border: '1px solid var(--border-light)',
                   boxShadow: 'var(--shadow-sm)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '16px',
                   transition: 'all 0.2s ease'
                 }}
               >
                 {/* Doctor Left Info */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: '240px' }}>
                   <img
                     src={doctor.avatar_url || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200"}
                     alt={doctor.full_name}
                     style={{
-                      width: '64px',
-                      height: '64px',
+                      width: '60px',
+                      height: '60px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '2px solid var(--border-light)'
+                      border: '2px solid var(--border-light)',
+                      flexShrink: 0
                     }}
                   />
                   <div>
-                    <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '3px' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '3px' }}>
                       {doctor.full_name}
                     </h3>
-                    <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '5px' }}>
                       {doctor.specialty}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#D97706', fontWeight: 700 }}>
-                        <Star size={14} fill="#D97706" /> {doctor.rating}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', flexWrap: 'wrap' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#D97706', fontWeight: 700 }}>
+                        <Star size={13} fill="#D97706" /> {doctor.rating}
                       </span>
                       <span style={{ color: 'var(--border-light)' }}>•</span>
                       <span style={{ color: 'var(--text-muted)' }}>
@@ -180,7 +183,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
                 <button
                   onClick={() => onSelectDoctor(doctor)}
                   className="btn-primary"
-                  style={{ padding: '10px 20px', borderRadius: 'var(--radius-md)' }}
+                  style={{ padding: '9px 18px', borderRadius: 'var(--radius-md)', fontSize: '13px', whiteSpace: 'nowrap' }}
                 >
                   {t('bookAppointmentBtn')}
                 </button>

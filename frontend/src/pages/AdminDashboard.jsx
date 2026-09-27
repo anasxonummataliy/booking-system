@@ -302,8 +302,8 @@ export default function AdminDashboard({ onNavigate }) {
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 76px)', backgroundColor: 'var(--bg-page)' }}>
-      {/* Sleek Custom Admin Sidebar */}
-      <aside style={{
+      {/* Sleek Custom Admin Sidebar - Hidden on mobile in favor of responsive mobile layout */}
+      <aside className="desktop-nav" style={{
         width: '270px',
         backgroundColor: '#0B132B',
         color: '#FFFFFF',
@@ -528,9 +528,29 @@ export default function AdminDashboard({ onNavigate }) {
       </aside>
 
       {/* Main Admin Workspace */}
-      <main style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
+      <main className="dashboard-main-content" style={{ flex: 1, padding: '36px 40px', overflowY: 'auto' }}>
+        {/* Mobile Horizontal Tabs Selector */}
+        <div className="mobile-only" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '20px' }}>
+          {[
+            { id: 'overview', label: t('adminTabOverview') },
+            { id: 'bookings', label: t('adminTabBookings') },
+            { id: 'services', label: t('adminTabServices') },
+            { id: 'doctors', label: t('adminTabDoctors') },
+            { id: 'schedules', label: t('adminTabSchedules') }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pill-filter ${activeTab === tab.id ? 'active' : ''}`}
+              style={{ fontSize: '12px', padding: '6px 14px', whiteSpace: 'nowrap' }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* Header Title */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
               {activeTab === 'overview' && t('adminTabOverview')}
@@ -579,7 +599,7 @@ export default function AdminDashboard({ onNavigate }) {
         {activeTab === 'overview' && (
           <div>
             {/* KPI Summary Cards */}
-            <div style={{
+            <div className="kpi-grid-4" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '20px',
