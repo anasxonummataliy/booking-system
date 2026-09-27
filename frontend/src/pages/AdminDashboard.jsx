@@ -18,7 +18,8 @@ import {
   Users,
   LogOut,
   X,
-  Stethoscope
+  Stethoscope,
+  Menu
 } from 'lucide-react';
 
 export default function AdminDashboard({ onNavigate }) {
@@ -27,6 +28,7 @@ export default function AdminDashboard({ onNavigate }) {
 
   // Active tab: 'overview' | 'bookings' | 'services' | 'doctors' | 'schedules'
   const [activeTab, setActiveTab] = useState('overview');
+  const [adminDrawerOpen, setAdminDrawerOpen] = useState(false);
 
   // Metrics and Data states
   const [bookings, setBookings] = useState([]);
@@ -299,7 +301,376 @@ export default function AdminDashboard({ onNavigate }) {
   });
 
   return (
-    <div className="admin-layout-root" style={{ height: 'calc(100vh - 70px)' }}>
+    <div className="admin-layout-root" style={{ height: '100vh' }}>
+      {/* Dedicated Admin Header */}
+      <header style={{
+        backgroundColor: '#0B132B',
+        color: '#FFFFFF',
+        padding: '12px 20px',
+        borderBottom: '1px solid #1E293B',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        flexShrink: 0,
+        boxShadow: 'var(--shadow-sm)'
+      }}>
+        {/* Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            backgroundColor: 'var(--primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+          }}>
+            <Plus size={20} color="#FFFFFF" strokeWidth={3} />
+          </div>
+          <div>
+            <span style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+              Health<span style={{ color: '#38BDF8' }}>Plus</span>
+            </span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              backgroundColor: 'rgba(56, 189, 248, 0.15)',
+              color: '#38BDF8',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              marginLeft: '8px',
+              letterSpacing: '0.6px'
+            }}>
+              Admin Portal
+            </span>
+          </div>
+        </div>
+
+        {/* Right Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Language Switcher */}
+          <div style={{
+            display: 'flex',
+            backgroundColor: '#1E293B',
+            borderRadius: 'var(--radius-full)',
+            padding: '2px'
+          }}>
+            <button
+              onClick={() => setLanguage('uz')}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '11px',
+                fontWeight: language === 'uz' ? 700 : 500,
+                backgroundColor: language === 'uz' ? 'var(--primary)' : 'transparent',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                border: 'none'
+              }}
+            >
+              🇺🇿 UZ
+            </button>
+            <button
+              onClick={() => setLanguage('en')}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '11px',
+                fontWeight: language === 'en' ? 700 : 500,
+                backgroundColor: language === 'en' ? 'var(--primary)' : 'transparent',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                border: 'none'
+              }}
+            >
+              🇬🇧 EN
+            </button>
+          </div>
+
+          {/* Admin User Chip (Desktop) */}
+          <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 10px', backgroundColor: '#1E293B', borderRadius: 'var(--radius-full)' }}>
+            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#4338CA', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700 }}>
+              {(user?.full_name || 'Admin')[0].toUpperCase()}
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#F1F5F9' }}>
+              {user?.full_name || 'Admin'}
+            </span>
+          </div>
+
+          {/* Logout (Desktop) */}
+          <button
+            onClick={() => {
+              if (window.confirm(t('logoutConfirm'))) {
+                logout();
+              }
+            }}
+            className="desktop-only"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              backgroundColor: '#EF4444',
+              color: '#FFFFFF',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)'
+            }}
+          >
+            <LogOut size={14} />
+            <span>{t('navLogout')}</span>
+          </button>
+
+          {/* Mobile Animated Hamburger Button */}
+          <button
+            onClick={() => setAdminDrawerOpen(true)}
+            className="mobile-only"
+            style={{
+              padding: '6px',
+              borderRadius: 'var(--radius-md)',
+              color: '#FFFFFF',
+              backgroundColor: '#1E293B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            aria-label="Open admin menu"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Animated Admin Drawer */}
+      {adminDrawerOpen && (
+        <div className="mobile-drawer-overlay" onClick={() => setAdminDrawerOpen(false)}>
+          <div className="mobile-drawer-content" onClick={e => e.stopPropagation()}>
+            {/* Drawer Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #1E293B'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Plus size={20} color="#FFFFFF" strokeWidth={3} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+                    Health<span style={{ color: '#38BDF8' }}>Plus</span>
+                  </span>
+                  <span style={{
+                    fontSize: '9px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                    color: '#38BDF8',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                    marginLeft: '6px'
+                  }}>
+                    Admin
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setAdminDrawerOpen(false)}
+                style={{
+                  color: '#94A3B8',
+                  backgroundColor: '#1E293B',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Admin Profile Card */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              backgroundColor: '#1E293B',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--primary)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '15px'
+              }}>
+                {(user?.full_name || 'Admin')[0].toUpperCase()}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.full_name || 'Admin HealthPlus'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.email || 'admin@healthplus.uz'}
+                </div>
+              </div>
+            </div>
+
+            {/* Admin Navigation Tabs */}
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                { id: 'overview', label: t('adminTabOverview'), icon: LayoutDashboard },
+                { id: 'bookings', label: t('adminTabBookings'), icon: Calendar, count: bookings.length },
+                { id: 'services', label: t('adminTabServices'), icon: Briefcase, count: services.length },
+                { id: 'doctors', label: t('adminTabDoctors'), icon: UserCheck, count: doctors.length },
+                { id: 'schedules', label: t('adminTabSchedules'), icon: Clock }
+              ].map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setAdminDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+                      padding: '12px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '15px',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#FFFFFF' : '#94A3B8',
+                      backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                      textAlign: 'left',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Icon size={19} />
+                    <span style={{ flex: 1 }}>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#1E293B',
+                        color: isActive ? '#FFFFFF' : '#94A3B8',
+                        padding: '2px 8px',
+                        borderRadius: '12px'
+                      }}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Language Switcher in Drawer */}
+            <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #1E293B' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.8px' }}>
+                {t('language')}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  onClick={() => setLanguage('uz')}
+                  style={{
+                    padding: '8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '13px',
+                    fontWeight: language === 'uz' ? 700 : 500,
+                    color: language === 'uz' ? '#FFFFFF' : '#94A3B8',
+                    backgroundColor: language === 'uz' ? 'var(--primary)' : '#1E293B',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🇺🇿 O'zbekcha
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  style={{
+                    padding: '8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '13px',
+                    fontWeight: language === 'en' ? 700 : 500,
+                    color: language === 'en' ? '#FFFFFF' : '#94A3B8',
+                    backgroundColor: language === 'en' ? 'var(--primary)' : '#1E293B',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🇬🇧 English
+                </button>
+              </div>
+            </div>
+
+            {/* Logout at bottom */}
+            <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+              <button
+                onClick={() => {
+                  if (window.confirm(t('logoutConfirm'))) {
+                    logout();
+                    setAdminDrawerOpen(false);
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '12px 14px',
+                  color: '#EF4444',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <LogOut size={18} />
+                <span>{t('navLogout')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Horizontal Tabs Selector */}
       <div className="mobile-only admin-mobile-tabs">
         {[
@@ -462,26 +833,6 @@ export default function AdminDashboard({ onNavigate }) {
             >
               <Clock size={18} />
               <span>{t('adminTabSchedules')}</span>
-            </button>
-
-            <div style={{ height: '1px', backgroundColor: '#1E293B', margin: '14px 0' }} />
-
-            <button
-              onClick={() => onNavigate('home')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 14px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#94A3B8',
-                textAlign: 'left'
-              }}
-            >
-              <Stethoscope size={18} />
-              <span>{t('navHome')}</span>
             </button>
           </nav>
         </div>

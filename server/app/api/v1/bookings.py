@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
 from app.database.models import User
+from app.database.models.enums import UserRole
 from app.schemas.booking import BookingCreate, BookingOut
 from app.services.booking_service import BookingService
 
@@ -20,6 +21,11 @@ def create_appointment(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if current_user.role == UserRole.ADMIN or str(current_user.role).lower() == "admin" or getattr(current_user, "is_admin", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Admin hisobidan buyurtma/qabul qilish taqiqlangan. Adminlar qabullarni faqat boshqarishi mumkin / Administrators cannot book appointments.",
+        )
     service = BookingService(db)
     return service.create_booking(user_id=current_user.id, data=data)
 

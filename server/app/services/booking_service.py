@@ -95,7 +95,7 @@ class BookingService:
                 {
                     "start_time": slot_start.isoformat(),
                     "end_time": slot_end.isoformat(),
-                    "display_time": slot_start.strftime("%I:%M %p"),
+                    "display_time": slot_start.strftime("%H:%M"),
                     "is_available": is_available,
                     "reason": "booked"
                     if is_booked

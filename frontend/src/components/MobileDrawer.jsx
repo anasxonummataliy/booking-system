@@ -154,31 +154,33 @@ export default function MobileDrawer({ isOpen, onClose, activePage, setActivePag
             </button>
           )}
 
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                onClose();
-                onOpenAuth('login');
-              } else {
-                handleNavigate('dashboard');
-              }
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-              padding: '12px 14px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '15px',
-              fontWeight: activePage === 'dashboard' ? 700 : 500,
-              color: activePage === 'dashboard' ? '#FFFFFF' : '#94A3B8',
-              backgroundColor: activePage === 'dashboard' ? 'var(--primary)' : 'transparent',
-              textAlign: 'left'
-            }}
-          >
-            <Calendar size={19} />
-            <span>{t('navAppointments')}</span>
-          </button>
+          {!isAdmin && (
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  onClose();
+                  onOpenAuth('login');
+                } else {
+                  handleNavigate('dashboard');
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '15px',
+                fontWeight: activePage === 'dashboard' ? 700 : 500,
+                color: activePage === 'dashboard' ? '#FFFFFF' : '#94A3B8',
+                backgroundColor: activePage === 'dashboard' ? 'var(--primary)' : 'transparent',
+                textAlign: 'left'
+              }}
+            >
+              <Calendar size={19} />
+              <span>{t('navAppointments')}</span>
+            </button>
+          )}
 
           <button
             onClick={() => handleNavigate('doctors')}

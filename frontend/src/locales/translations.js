@@ -119,6 +119,8 @@ export const translations = {
     patientNotesPlaceholder: 'Shikoyatingiz yoki oldingi tahlillar haqida qisqacha yozing...',
     confirmBookingAction: 'Qabulni tasdiqlash',
     loginToBookAction: 'Bron qilish uchun tizimga kiring',
+    adminCannotBookError: "Admin hisobidan qabulga yozilish mumkin emas. Buyurtmalarni boshqarish uchun Admin Dashboard'dan foydalaning.",
+    adminCannotBookBanner: "Admin hisobidan qabulga yozilish taqiqlangan",
 
     // Confirmation Modal
     confirmedSuccessTitle: 'Qabul muvaffaqiyatli band qilindi!',
@@ -366,6 +368,8 @@ export const translations = {
     patientNotesPlaceholder: 'Briefly describe your symptoms or past diagnosis...',
     confirmBookingAction: 'Confirm Booking',
     loginToBookAction: 'Sign in to complete booking',
+    adminCannotBookError: "Administrators cannot book appointments. Please use the Admin Dashboard to manage clinic bookings.",
+    adminCannotBookBanner: "Admins cannot book appointments",
 
     // Confirmation Modal
     confirmedSuccessTitle: 'Appointment Confirmed!',

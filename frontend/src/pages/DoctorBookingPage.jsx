@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { formatMonthYear, formatDayMonth } from '../utils/dateFormatter';
+import { formatMonthYear, formatDayMonth, formatSlotTime } from '../utils/dateFormatter';
 import {
   ArrowLeft,
   Star,
@@ -18,7 +18,7 @@ export default function DoctorBookingPage({
   onBookingSuccess,
   onOpenAuth
 }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState('about');
   
@@ -98,6 +98,10 @@ export default function DoctorBookingPage({
   };
 
   const handleBookAppointment = async () => {
+    if (isAdmin) {
+      setBookingError(t('adminCannotBookError'));
+      return;
+    }
     if (!isAuthenticated) {
       onOpenAuth('login');
       return;
@@ -488,7 +492,7 @@ export default function DoctorBookingPage({
                           transition: 'all 0.15s ease'
                         }}
                       >
-                        {slot.display_time}
+                        {formatSlotTime(slot.display_time)}
                       </button>
                     );
                   })}
@@ -497,19 +501,39 @@ export default function DoctorBookingPage({
             </div>
 
             {/* Book Button */}
-            <button
-              onClick={handleBookAppointment}
-              disabled={!selectedSlot || bookingLoading}
-              className="btn-primary"
-              style={{
-                width: '100%',
+            {isAdmin ? (
+              <div style={{
                 padding: '14px',
-                fontSize: '15px',
-                borderRadius: 'var(--radius-md)'
-              }}
-            >
-              {bookingLoading ? t('loading') : (!isAuthenticated ? t('loginToBookAction') : `${t('confirmBookingAction')} ($${doctor.consultation_fee})`)}
-            </button>
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
+                color: '#B91C1C',
+                fontSize: '14px',
+                fontWeight: 600,
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}>
+                <AlertCircle size={18} />
+                <span>{t('adminCannotBookBanner')}</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleBookAppointment}
+                disabled={!selectedSlot || bookingLoading}
+                className="btn-primary"
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  fontSize: '15px',
+                  borderRadius: 'var(--radius-md)'
+                }}
+              >
+                {bookingLoading ? t('loading') : (!isAuthenticated ? t('loginToBookAction') : `${t('confirmBookingAction')} ($${doctor.consultation_fee})`)}
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -25,6 +25,6 @@ def test_doctor_slots_generation(client, test_doctor):
     slots = response.json()
     assert len(slots) > 0
     # Break time 13:00 - 14:00 should not be available
-    break_slot = next((s for s in slots if "01:00 PM" in s["display_time"]), None)
+    break_slot = next((s for s in slots if "13:00" in s["display_time"]), None)
     if break_slot:
         assert break_slot["is_available"] is False

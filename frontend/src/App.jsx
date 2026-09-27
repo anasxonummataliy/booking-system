@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import MobileDrawer from './components/MobileDrawer';
@@ -16,6 +16,7 @@ import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
   const { isAuthenticated, isAdmin } = useAuth();
+  const { t } = useLanguage();
   
   // Page navigation state: 'home' | 'services' | 'doctors' | 'doctor-booking' | 'dashboard' | 'profile' | 'admin'
   const [activePage, setActivePage] = useState('home');
@@ -37,6 +38,11 @@ function AppContent() {
   };
 
   const handleSelectDoctor = (doctor, initialDate = null) => {
+    if (isAdmin) {
+      alert(t('adminCannotBookError') || "Admin hisobidan qabulga yozilish mumkin emas. Buyurtmalarni boshqarish uchun Admin Dashboard'dan foydalaning.");
+      setActivePage('admin');
+      return;
+    }
     setSelectedDoctor(doctor);
     setSelectedBookingDate(initialDate);
     setActivePage('doctor-booking');
@@ -51,12 +57,10 @@ function AppContent() {
     setConfirmationModalOpen(true);
   };
 
-  // When logged in as admin on home, open admin dashboard
-  React.useEffect(() => {
-    if (isAuthenticated && isAdmin && activePage === 'home') {
-      setActivePage('admin');
-    }
-  }, [isAuthenticated, isAdmin]);
+  // If authenticated as admin, ONLY show AdminDashboard (no patient navbar/bottom nav/drawer)
+  if (isAuthenticated && isAdmin) {
+    return <AdminDashboard />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

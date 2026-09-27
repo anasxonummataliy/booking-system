@@ -33,25 +33,39 @@ export const EN_DAYS_FULL = [
 ];
 
 /**
- * Format a Date object or ISO string to a clean time string: "10:00" or "10:00 AM"
+ * Format a Date object or ISO string to a clean 24-hour time string: "09:00", "14:30"
  */
-export function formatTime(dateInput, lang = 'uz') {
+export function formatTime(dateInput) {
   if (!dateInput) return '';
   const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
   if (isNaN(d.getTime())) return '';
 
-  const hours = d.getHours();
+  const hours = String(d.getHours()).padStart(2, '0');
   const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
 
-  if (lang === 'en') {
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const h12 = hours % 12 || 12;
-    return `${h12}:${minutes} ${ampm}`;
+/**
+ * Format time slot strings ensuring 24-hour format: e.g. "09:00 AM" -> "09:00", "02:30 PM" -> "14:30"
+ */
+export function formatSlotTime(timeStr) {
+  if (!timeStr) return '';
+  const trimmed = timeStr.trim();
+  if (trimmed.includes('AM') || trimmed.includes('PM') || trimmed.includes('am') || trimmed.includes('pm')) {
+    const parts = trimmed.split(' ');
+    const timeParts = parts[0].split(':');
+    let h = parseInt(timeParts[0], 10);
+    const m = timeParts[1];
+    const modifier = parts[1].toUpperCase();
+    if (modifier === 'PM' && h < 12) h += 12;
+    if (modifier === 'AM' && h === 12) h = 0;
+    return `${String(h).padStart(2, '0')}:${m}`;
   }
-
-  // Uzbek 24-hour standard: "10:00", "14:30"
-  const h24 = String(hours).padStart(2, '0');
-  return `${h24}:${minutes}`;
+  if (trimmed.includes('T')) {
+    const d = new Date(trimmed);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+  return trimmed;
 }
 
 /**

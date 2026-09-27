@@ -56,9 +56,10 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
             { id: 'home', label: t('navHome') },
             { id: 'services', label: t('navServices') },
             { id: 'doctors', label: t('navDoctors') },
-            { id: 'dashboard', label: t('navAppointments'), authRequired: true },
+            { id: 'dashboard', label: t('navAppointments'), authRequired: true, hideForAdmin: true },
           ].map(link => {
             if (link.authRequired && !isAuthenticated) return null;
+            if (link.hideForAdmin && isAdmin) return null;
             const isActive = activePage === link.id;
             return (
               <button
@@ -217,22 +218,24 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
                     <User size={16} color="var(--primary)" /> {t('bottomNavProfile')}
                   </button>
 
-                  <button
-                    onClick={() => { setActivePage('dashboard'); setDropdownOpen(false); }}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      fontSize: '14px',
-                      color: 'var(--text-main)',
-                      borderRadius: 'var(--radius-sm)',
-                      textAlign: 'left'
-                    }}
-                  >
-                    <Calendar size={16} color="var(--primary)" /> {t('navAppointments')}
-                  </button>
+                  {!isAdmin && (
+                    <button
+                      onClick={() => { setActivePage('dashboard'); setDropdownOpen(false); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        fontSize: '14px',
+                        color: 'var(--text-main)',
+                        borderRadius: 'var(--radius-sm)',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <Calendar size={16} color="var(--primary)" /> {t('navAppointments')}
+                    </button>
+                  )}
 
                   {isAdmin && (
                     <button

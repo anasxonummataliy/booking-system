@@ -27,21 +27,32 @@ export default function BottomNav({ activePage, setActivePage, onOpenAuth, onOpe
         <span>{t('bottomNavHome')}</span>
       </button>
 
-      {/* Appointments Tab */}
-      <button
-        onClick={() => {
-          if (!isAuthenticated) {
-            onOpenAuth('login');
-          } else {
-            setActivePage('dashboard');
-          }
-        }}
-        className={`bottom-nav-item ${activePage === 'dashboard' ? 'active' : ''}`}
-        aria-label={t('bottomNavAppointments')}
-      >
-        <Calendar size={20} strokeWidth={activePage === 'dashboard' ? 2.5 : 2} />
-        <span>{t('bottomNavAppointments')}</span>
-      </button>
+      {/* Appointments Tab (Patients) or Profile Tab (Admin) */}
+      {!isAdmin ? (
+        <button
+          onClick={() => {
+            if (!isAuthenticated) {
+              onOpenAuth('login');
+            } else {
+              setActivePage('dashboard');
+            }
+          }}
+          className={`bottom-nav-item ${activePage === 'dashboard' ? 'active' : ''}`}
+          aria-label={t('bottomNavAppointments')}
+        >
+          <Calendar size={20} strokeWidth={activePage === 'dashboard' ? 2.5 : 2} />
+          <span>{t('bottomNavAppointments')}</span>
+        </button>
+      ) : (
+        <button
+          onClick={() => setActivePage('profile')}
+          className={`bottom-nav-item ${activePage === 'profile' ? 'active' : ''}`}
+          aria-label={t('bottomNavProfile')}
+        >
+          <User size={20} strokeWidth={activePage === 'profile' ? 2.5 : 2} />
+          <span>{t('bottomNavProfile')}</span>
+        </button>
+      )}
 
       {/* Doctors Tab */}
       <button
