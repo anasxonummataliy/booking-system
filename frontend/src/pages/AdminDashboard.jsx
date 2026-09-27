@@ -125,11 +125,7 @@ export default function AdminDashboard({ onNavigate }) {
     setActionLoadingId(bookingId);
     try {
       await api.updateBookingStatus(bookingId, newStatus);
-      const [m, b] = await Promise.all([
-        api.getAdminMetrics(),
-        api.getAllBookings(filterStatus)
-      ]);
-      setMetrics(m);
+      const b = await api.getAllBookings(filterStatus);
       setBookings(b || []);
     } catch (err) {
       alert(err.message || "Failed to update booking status");
