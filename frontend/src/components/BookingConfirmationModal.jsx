@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { formatDateOnly, formatTime } from '../utils/dateFormatter';
 import { Check, Calendar, Clock, MapPin, DollarSign, X } from 'lucide-react';
 
 export default function BookingConfirmationModal({ isOpen, booking, onClose, onViewAppointments, onBookAnother }) {
@@ -7,15 +8,9 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
   if (!isOpen || !booking) return null;
 
   const doctor = booking.doctor || {};
-  const dateFormatted = new Date(booking.start_time).toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-  const timeFormatted = new Date(booking.start_time).toLocaleTimeString(language === 'uz' ? 'uz-UZ' : 'en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const dateFormatted = formatDateOnly(booking.start_time, language);
+  const timeFormatted = formatTime(booking.start_time, language);
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>

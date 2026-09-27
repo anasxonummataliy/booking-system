@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { formatDateTime } from '../utils/dateFormatter';
 import {
   LayoutDashboard,
   Calendar,
@@ -280,10 +281,7 @@ export default function AdminDashboard({ onNavigate }) {
     }
   };
 
-  const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return `${d.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • ${d.toLocaleTimeString(language === 'uz' ? 'uz-UZ' : 'en-US', { hour: '2-digit', minute: '2-digit' })}`;
-  };
+  const formatDate = (dateStr) => formatDateTime(dateStr, language);
 
   const dayNames = language === 'uz'
     ? ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba']

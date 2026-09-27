@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { formatMonthYear, formatDayMonth } from '../utils/dateFormatter';
 import {
   ArrowLeft,
   Star,
@@ -63,7 +64,7 @@ export default function DoctorBookingPage({
   // Calendar calculations
   const year = currentMonthDate.getFullYear();
   const month = currentMonthDate.getMonth();
-  const monthName = currentMonthDate.toLocaleString('default', { month: 'long' });
+  const monthName = formatMonthYear(currentMonthDate, language);
 
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -350,7 +351,7 @@ export default function DoctorBookingPage({
               {/* Calendar Month Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main)' }}>
-                  {monthName} {year}
+                  {monthName}
                 </span>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button
@@ -446,7 +447,7 @@ export default function DoctorBookingPage({
                   {t('selectTimeStep')}
                 </label>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {selectedDate.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric' })}
+                  {formatDayMonth(selectedDate, language)}
                 </span>
               </div>
 
