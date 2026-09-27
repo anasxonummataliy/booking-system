@@ -468,38 +468,9 @@ export default function AdminDashboard({ onNavigate }) {
         {/* Sleek Custom Admin Sidebar (Desktop) */}
         <aside className="desktop-only admin-desktop-sidebar">
         <div>
-          {/* Logo & Admin Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', paddingLeft: '8px' }}>
-            <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '10px',
-              backgroundColor: 'var(--primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.4)'
-            }}>
-              <Plus size={22} color="#FFFFFF" strokeWidth={3} />
-            </div>
-            <div>
-              <span style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-                Health<span style={{ color: '#38BDF8' }}>Plus</span>
-              </span>
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                color: '#38BDF8',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                marginLeft: '8px',
-                letterSpacing: '0.6px'
-              }}>
-                Portal
-              </span>
-            </div>
+          {/* Sidebar Section Heading */}
+          <div style={{ padding: '4px 12px 14px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#64748B' }}>
+            {t('navAdmin')}
           </div>
 
           {/* Navigation Tabs */}
