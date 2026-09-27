@@ -151,8 +151,33 @@ docker compose up --build
 ```bash
 cd server
 uv sync # or: uv pip install -r requirements.txt
-# Run the FastAPI server (starts on SQLite fallback or PostgreSQL depending on DATABASE_URL):
+
+# Run Alembic migrations:
+uv run alembic upgrade head
+
+# Run the FastAPI server:
 uv run uvicorn app.main:app --reload --port 8000
+```
+
+---
+
+## 🔄 Alembic Database Migrations
+
+Database schema migrations are version-controlled with Alembic:
+```bash
+cd server
+
+# Apply all migrations to the latest version:
+uv run alembic upgrade head
+
+# Generate a new migration after editing SQLAlchemy models:
+uv run alembic revision --autogenerate -m "describe_schema_change"
+
+# Check the current database migration revision:
+uv run alembic current
+
+# Rollback one migration step:
+uv run alembic downgrade -1
 ```
 
 #### Frontend Setup:
