@@ -13,72 +13,112 @@ from app.database.models import (
 )
 
 
-def seed_database():
+def seed_database(force: bool = False):
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
-    # Check if already seeded
-    if db.query(User).filter(User.email == "alex@healthplus.com").first():
-        print("Database already contains seed data. Skipping...")
+    # Check if already seeded with new Uzbek doctors
+    existing_uzbek_doctor = db.query(Doctor).filter(Doctor.full_name == "Dr. Alisher Usmonov").first()
+    if existing_uzbek_doctor and not force:
+        print("Database already contains Uzbek doctors seed data. Skipping...")
         db.close()
         return
 
-    print("Seeding database with HealthPlus data...")
+    print("Seeding database with HealthPlus Uzbek doctors data...")
 
-    # 1. Create Users
-    admin_user = User(
-        email="admin@healthplus.com",
-        full_name="Admin HealthPlus",
-        phone="+998901234567",
-        hashed_password=hash_password("admin123"),
-        role=UserRole.ADMIN.value,
-        is_active=True,
-    )
-    db.add(admin_user)
+    # If force or upgrading from old data, remove existing bookings, schedules, and doctors
+    if force or not existing_uzbek_doctor:
+        db.query(Booking).delete()
+        db.query(DoctorSchedule).delete()
+        db.query(Doctor).delete()
+        db.commit()
 
-    alex_user = User(
-        email="alex@healthplus.com",
-        full_name="Alex Turner",
-        phone="+998909876543",
-        hashed_password=hash_password("password123"),
-        role=UserRole.USER.value,
-        is_active=True,
-    )
-    db.add(alex_user)
+    # 1. Create or get Users
+    admin_user = db.query(User).filter(User.email == "admin@healthplus.com").first()
+    if not admin_user:
+        admin_user = User(
+            email="admin@healthplus.com",
+            full_name="Admin HealthPlus",
+            phone="+998901234567",
+            hashed_password=hash_password("admin123"),
+            role=UserRole.ADMIN.value,
+            is_active=True,
+        )
+        db.add(admin_user)
+
+    alex_user = db.query(User).filter(User.email == "alex@healthplus.com").first()
+    if not alex_user:
+        alex_user = User(
+            email="alex@healthplus.com",
+            full_name="Alex Turner",
+            phone="+998909876543",
+            hashed_password=hash_password("password123"),
+            role=UserRole.USER.value,
+            is_active=True,
+        )
+        db.add(alex_user)
+
+    # Doctor user account
+    nodira_user = db.query(User).filter(User.email == "nodira.karimova@healthplus.com").first()
+    if not nodira_user:
+        nodira_user = User(
+            email="nodira.karimova@healthplus.com",
+            full_name="Dr. Nodira Karimova",
+            phone="+998971234567",
+            hashed_password=hash_password("doctor123"),
+            role=UserRole.DOCTOR.value,
+            is_active=True,
+        )
+        db.add(nodira_user)
 
     # Extra patients
-    patient_ali = User(
-        email="ali@example.com",
-        full_name="Ali Karimov",
-        phone="+998931112233",
-        hashed_password=hash_password("password123"),
-        role=UserRole.USER.value,
-    )
-    patient_sevinch = User(
-        email="sevinch@example.com",
-        full_name="Sevinch Tursunova",
-        phone="+998932223344",
-        hashed_password=hash_password("password123"),
-        role=UserRole.USER.value,
-    )
-    patient_behzod = User(
-        email="behzod@example.com",
-        full_name="Behzod Rahimov",
-        phone="+998933334455",
-        hashed_password=hash_password("password123"),
-        role=UserRole.USER.value,
-    )
-    patient_malika = User(
-        email="malika@example.com",
-        full_name="Malika Sodiqova",
-        phone="+998934445566",
-        hashed_password=hash_password("password123"),
-        role=UserRole.USER.value,
-    )
-    db.add_all([patient_ali, patient_sevinch, patient_behzod, patient_malika])
+    patient_ali = db.query(User).filter(User.email == "ali@example.com").first()
+    if not patient_ali:
+        patient_ali = User(
+            email="ali@example.com",
+            full_name="Ali Karimov",
+            phone="+998931112233",
+            hashed_password=hash_password("password123"),
+            role=UserRole.USER.value,
+        )
+        db.add(patient_ali)
+
+    patient_sevinch = db.query(User).filter(User.email == "sevinch@example.com").first()
+    if not patient_sevinch:
+        patient_sevinch = User(
+            email="sevinch@example.com",
+            full_name="Sevinch Tursunova",
+            phone="+998932223344",
+            hashed_password=hash_password("password123"),
+            role=UserRole.USER.value,
+        )
+        db.add(patient_sevinch)
+
+    patient_behzod = db.query(User).filter(User.email == "behzod@example.com").first()
+    if not patient_behzod:
+        patient_behzod = User(
+            email="behzod@example.com",
+            full_name="Behzod Rahimov",
+            phone="+998933334455",
+            hashed_password=hash_password("password123"),
+            role=UserRole.USER.value,
+        )
+        db.add(patient_behzod)
+
+    patient_malika = db.query(User).filter(User.email == "malika@example.com").first()
+    if not patient_malika:
+        patient_malika = User(
+            email="malika@example.com",
+            full_name="Malika Sodiqova",
+            phone="+998934445566",
+            hashed_password=hash_password("password123"),
+            role=UserRole.USER.value,
+        )
+        db.add(patient_malika)
+
     db.commit()
 
-    # 2. Create Services
+    # 2. Create or fetch Services
     services_data = [
         {
             "name": "General Checkup",
@@ -133,99 +173,187 @@ def seed_database():
 
     services_map = {}
     for s in services_data:
-        svc = Service(**s)
-        db.add(svc)
-        db.flush()
-        services_map[s["name"]] = svc
+        existing_svc = db.query(Service).filter(Service.name == s["name"]).first()
+        if not existing_svc:
+            existing_svc = Service(**s)
+            db.add(existing_svc)
+            db.flush()
+        services_map[s["name"]] = existing_svc
 
     db.commit()
 
-    # 3. Create Doctors
+    # 3. Create 10 Authentic Uzbekistani Doctors
     doctors_data = [
         {
-            "full_name": "Dr. Sarah Johnson",
-            "specialty": "General Practitioner",
-            "service_id": services_map["General Checkup"].id,
-            "bio": (
-                "Dr. Sarah Johnson is a dedicated general practitioner with a focus on "
-                "preventive care, lifestyle medicine, and overall patient wellness."
-            ),
-            "rating": 4.8,
-            "reviews_count": 124,
-            "experience_years": 8,
-            "consultation_fee": 30.0,
-            "avatar_url": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=300",
-            "education": "Tashkent Medical Academy, 2015",
-            "languages": "English, Uzbek, Russian",
-            "location": "City Medical Center, Tashkent",
-        },
-        {
-            "full_name": "Dr. Michael Brown",
-            "specialty": "Cardiologist",
+            "full_name": "Dr. Alisher Usmonov",
+            "specialty": "Kardiolog",
             "service_id": services_map["Cardiology"].id,
             "bio": (
-                "Senior cardiologist specializing in hypertension management, "
-                "arrhythmia diagnosis, and comprehensive cardiovascular risk assessments."
+                "Toshkent Tibbiyot Akademiyasi professori, 15 yillik tajribaga ega yetakchi kardiolog. "
+                "Gipertoniya, yurak ishemik kasalligi va aritmiyalarni zamonaviy xalqaro standartlar "
+                "bo‘yicha tashxislash va davolash mutaxassisi."
             ),
             "rating": 4.9,
-            "reviews_count": 182,
-            "experience_years": 12,
+            "reviews_count": 215,
+            "experience_years": 15,
             "consultation_fee": 70.0,
-            "avatar_url": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=300",
-            "education": "Samarkand State Medical University, 2012",
-            "languages": "English, Uzbek",
-            "location": "Central Cardiology Institute, Tashkent",
+            "avatar_url": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Tibbiyot Akademiyasi, 2009",
+            "languages": "O'zbek, Rus, Ingliz",
+            "location": "Respublika Kardiologiya Markazi, Toshkent",
         },
         {
-            "full_name": "Dr. Emily Davis",
-            "specialty": "Dermatologist",
-            "service_id": services_map["Dermatology"].id,
+            "full_name": "Dr. Nodira Karimova",
+            "specialty": "Umumiy amaliyot shifokori",
+            "service_id": services_map["General Checkup"].id,
             "bio": (
-                "Board-certified dermatologist experienced in diagnosing acne, eczema, psoriasis, "
-                "and performing dermoscopy for skin cancer screening."
-            ),
-            "rating": 4.7,
-            "reviews_count": 95,
-            "experience_years": 7,
-            "consultation_fee": 50.0,
-            "avatar_url": "https://images.unsplash.com/photo-1594824813633-46c596e12368?auto=format&fit=crop&q=80&w=300",
-            "education": "Tashkent Pediatric Medical Institute, 2017",
-            "languages": "English, Russian",
-            "location": "Skin & Laser Center, Tashkent",
-        },
-        {
-            "full_name": "Dr. James Wilson",
-            "specialty": "Pediatrician",
-            "service_id": services_map["Pediatrics"].id,
-            "bio": (
-                "Passionate pediatrician creating a friendly, reassuring environment for "
-                "infants and children while treating acute childhood conditions."
+                "Oila shifokori va umumiy amaliyot terapevti. Butun tana a'zolari salomatligi monitoringi, "
+                "profilaktik ko‘riklar va sog‘lom turmush tarzi bo‘yicha 10 yillik tajribali mutaxassis."
             ),
             "rating": 4.8,
-            "reviews_count": 140,
+            "reviews_count": 142,
             "experience_years": 10,
-            "consultation_fee": 40.0,
-            "avatar_url": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=300",
-            "education": "Tashkent Medical Academy, 2014",
-            "languages": "English, Uzbek, Russian",
-            "location": "Children's Health Clinic, Tashkent",
+            "consultation_fee": 30.0,
+            "avatar_url": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Tibbiyot Akademiyasi, 2014",
+            "languages": "O'zbek, Rus",
+            "location": "HealthPlus City Clinic, Chilonzor tumani, Toshkent",
         },
         {
-            "full_name": "Dr. Lisa Anderson",
-            "specialty": "Gynecologist",
-            "service_id": services_map["Gynecology"].id,
+            "full_name": "Dr. Jasur Rahimov",
+            "specialty": "Dermatolog",
+            "service_id": services_map["Dermatology"].id,
             "bio": (
-                "Compassionate women's health specialist with extensive background in "
-                "obstetrics, reproductive endocrine care, and ultrasound screening."
+                "Teri, soch va tirnoq kasalliklarini davolash bo‘yicha yuqori toifali dermatolog. "
+                "Dermatoskopik tahlillar, akne va ekzemani samarali kompleks davolash bo‘yicha mutaxassis."
             ),
             "rating": 4.9,
-            "reviews_count": 160,
-            "experience_years": 11,
+            "reviews_count": 165,
+            "experience_years": 8,
+            "consultation_fee": 50.0,
+            "avatar_url": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Pediatriya Tibbiyot Instituti, 2016",
+            "languages": "O'zbek, Rus, Ingliz",
+            "location": "Dermatologiya va Kosmetologiya Markazi, Toshkent",
+        },
+        {
+            "full_name": "Dr. Shahnoza Umarova",
+            "specialty": "Bolalar shifokori",
+            "service_id": services_map["Pediatrics"].id,
+            "bio": (
+                "Bolalar salomatligi, chaqaloqlar rivojlanishi, immunizatsiya va mavsumiy "
+                "yuqumli kasalliklarni aniqlash hamda yengil davolash bo‘yicha mehribon va malakali pediatr."
+            ),
+            "rating": 4.9,
+            "reviews_count": 189,
+            "experience_years": 12,
+            "consultation_fee": 40.0,
+            "avatar_url": "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Pediatriya Tibbiyot Instituti, 2012",
+            "languages": "O'zbek, Rus",
+            "location": "Bolalar Salomatligi Markazi, Yunusobod tumani, Toshkent",
+        },
+        {
+            "full_name": "Dr. Dilnoza Ahmedova",
+            "specialty": "Ginekolog",
+            "service_id": services_map["Gynecology"].id,
+            "bio": (
+                "Ayollar salomatligi, reproduktiv tibbiyot, homiladorlikka tayyorgarlik va "
+                "profilaktika bo‘yicha 14 yillik amaliy tajribaga ega oliy toifali akusher-ginekolog."
+            ),
+            "rating": 4.8,
+            "reviews_count": 198,
+            "experience_years": 14,
             "consultation_fee": 60.0,
-            "avatar_url": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=300",
-            "education": "Bukhara State Medical Institute, 2013",
-            "languages": "English, Uzbek",
-            "location": "Women's Wellness Wing, Tashkent",
+            "avatar_url": "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&q=80&w=400",
+            "education": "Samarqand Davlat Tibbiyot Universiteti, 2010",
+            "languages": "O'zbek, Rus, Ingliz",
+            "location": "Ayollar Salomatligi Markazi, Mirzo Ulug‘bek tumani, Toshkent",
+        },
+        {
+            "full_name": "Dr. Bekzod Rustamov",
+            "specialty": "Ortoped-Travmatolog",
+            "service_id": services_map["Orthopedics"].id,
+            "bio": (
+                "Suyak, bo‘g‘im, umurtqa xastaliklari hamda sport jarohatlaridan keyingi "
+                "reabilitatsiya bo‘yicha tajribali ortoped-travmatolog xirurg."
+            ),
+            "rating": 4.7,
+            "reviews_count": 114,
+            "experience_years": 9,
+            "consultation_fee": 80.0,
+            "avatar_url": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400",
+            "education": "Andijon Davlat Tibbiyot Instituti, 2015",
+            "languages": "O'zbek, Rus",
+            "location": "Travmatologiya va Ortopediya Markazi, Toshkent",
+        },
+        {
+            "full_name": "Dr. Feruza Mahmudova",
+            "specialty": "Umumiy amaliyot shifokori",
+            "service_id": services_map["General Checkup"].id,
+            "bio": (
+                "Terapevtik kasalliklar, qon bosimi va metabolik o‘zgarishlarni profilaktika qilish "
+                "hamda zamonaviy tekshiruvlar asosida sog‘lomlashtirish bo‘yicha mutaxassis."
+            ),
+            "rating": 4.8,
+            "reviews_count": 126,
+            "experience_years": 7,
+            "consultation_fee": 35.0,
+            "avatar_url": "https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&q=80&w=400",
+            "education": "Buxoro Davlat Tibbiyot Instituti, 2017",
+            "languages": "O'zbek, Rus, Ingliz",
+            "location": "Medion Family Clinic, Shayxontohur tumani, Toshkent",
+        },
+        {
+            "full_name": "Dr. Jamshid To'rayev",
+            "specialty": "Kardiolog",
+            "service_id": services_map["Cardiology"].id,
+            "bio": (
+                "EKG, ultratovushli kardiografiya va yurak aritmiyalari bo‘yicha ixtisoslashgan kardiolog. "
+                "Yevropa Kardiologlar Jamiyati (ESC) xalqaro sertifikati sohibi."
+            ),
+            "rating": 4.9,
+            "reviews_count": 172,
+            "experience_years": 11,
+            "consultation_fee": 65.0,
+            "avatar_url": "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Tibbiyot Akademiyasi, 2013",
+            "languages": "O'zbek, Rus, Ingliz",
+            "location": "Central Cardio Institute, Yakkasaroy tumani, Toshkent",
+        },
+        {
+            "full_name": "Dr. Kamola Zokirova",
+            "specialty": "Dermatolog-Kosmetolog",
+            "service_id": services_map["Dermatology"].id,
+            "bio": (
+                "Estetik va tibbiy dermatologiya, teri muammolari, toshmalar va yoshga doir "
+                "o‘zgarishlarni xavfsiz davolash bo‘yicha zamonaviy dermatolog."
+            ),
+            "rating": 4.8,
+            "reviews_count": 95,
+            "experience_years": 6,
+            "consultation_fee": 45.0,
+            "avatar_url": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Tibbiyot Akademiyasi, 2018",
+            "languages": "O'zbek, Rus",
+            "location": "Skin Care Aesthetics, Mirobod tumani, Toshkent",
+        },
+        {
+            "full_name": "Dr. Otabek Sobirov",
+            "specialty": "Bolalar shifokori",
+            "service_id": services_map["Pediatrics"].id,
+            "bio": (
+                "Bolalar infeksion kasalliklari, nafas yo‘llari allergik reaksiyalari va bolalar "
+                "immunitetini mustahkamlash bo‘yicha 13 yillik tajribali pediatr."
+            ),
+            "rating": 4.9,
+            "reviews_count": 204,
+            "experience_years": 13,
+            "consultation_fee": 40.0,
+            "avatar_url": "https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&q=80&w=400",
+            "education": "Toshkent Pediatriya Tibbiyot Instituti, 2011",
+            "languages": "O'zbek, Rus",
+            "location": "Pediatriya Ilmiy Markazi, Olmazor tumani, Toshkent",
         },
     ]
 
@@ -252,74 +380,73 @@ def seed_database():
 
     db.commit()
 
-    # 4. Create Initial Bookings (Matching screenshot)
-    # Target dates
+    # 4. Create Initial Demo Bookings with new doctors
     today = date.today()
     upcoming_date = today + timedelta(days=2)
     past_date1 = today - timedelta(days=5)
     past_date2 = today - timedelta(days=12)
     past_date3 = today - timedelta(days=20)
 
-    dr_sarah = doctors_map["Dr. Sarah Johnson"]
-    dr_michael = doctors_map["Dr. Michael Brown"]
-    dr_emily = doctors_map["Dr. Emily Davis"]
-    dr_james = doctors_map["Dr. James Wilson"]
+    dr_nodira = doctors_map["Dr. Nodira Karimova"]
+    dr_alisher = doctors_map["Dr. Alisher Usmonov"]
+    dr_jasur = doctors_map["Dr. Jasur Rahimov"]
+    dr_shahnoza = doctors_map["Dr. Shahnoza Umarova"]
 
     bookings_data = [
         # Alex's upcoming booking
         Booking(
             booking_reference="HP-2025-4891",
             user_id=alex_user.id,
-            doctor_id=dr_sarah.id,
+            doctor_id=dr_nodira.id,
             service_id=services_map["General Checkup"].id,
             start_time=datetime.combine(upcoming_date, time(10, 0)),
             end_time=datetime.combine(upcoming_date, time(10, 30)),
             status=BookingStatus.CONFIRMED.value,
             total_price=30.0,
-            notes="Routine annual physical examination and blood pressure test.",
+            notes="Muntazam yillik tibbiy ko'rik va qon bosimi nazorati.",
         ),
         # Alex's past completed booking
         Booking(
             booking_reference="HP-2025-3120",
             user_id=alex_user.id,
-            doctor_id=dr_michael.id,
+            doctor_id=dr_alisher.id,
             service_id=services_map["Cardiology"].id,
             start_time=datetime.combine(past_date1, time(14, 30)),
             end_time=datetime.combine(past_date1, time(15, 30)),
             status=BookingStatus.COMPLETED.value,
             total_price=70.0,
-            notes="ECG checkup and cardiology review.",
+            notes="EKG tahlili va kardiologiya konsultatsiyasi.",
         ),
         # Alex's completed dermatology
         Booking(
             booking_reference="HP-2025-2415",
             user_id=alex_user.id,
-            doctor_id=dr_emily.id,
+            doctor_id=dr_jasur.id,
             service_id=services_map["Dermatology"].id,
             start_time=datetime.combine(past_date2, time(11, 0)),
             end_time=datetime.combine(past_date2, time(11, 45)),
             status=BookingStatus.COMPLETED.value,
             total_price=50.0,
-            notes="Skin allergy assessment.",
+            notes="Teri allergiyasi va dermatoskopiya tekshiruvi.",
         ),
         # Alex's cancelled appointment
         Booking(
             booking_reference="HP-2025-1088",
             user_id=alex_user.id,
-            doctor_id=dr_james.id,
+            doctor_id=dr_shahnoza.id,
             service_id=services_map["Pediatrics"].id,
             start_time=datetime.combine(past_date3, time(9, 30)),
             end_time=datetime.combine(past_date3, time(10, 10)),
             status=BookingStatus.CANCELLED.value,
             total_price=40.0,
-            notes="Followup consultation",
-            cancellation_reason="Rescheduled to another week",
+            notes="Qayta ko'rik konsultatsiyasi",
+            cancellation_reason="Boshqa haftaga ko'chirildi",
         ),
         # Admin dashboard other patient bookings
         Booking(
             booking_reference="HP-2025-9011",
             user_id=patient_ali.id,
-            doctor_id=dr_sarah.id,
+            doctor_id=dr_nodira.id,
             service_id=services_map["General Checkup"].id,
             start_time=datetime.combine(today + timedelta(days=1), time(10, 0)),
             end_time=datetime.combine(today + timedelta(days=1), time(10, 30)),
@@ -329,7 +456,7 @@ def seed_database():
         Booking(
             booking_reference="HP-2025-9012",
             user_id=patient_sevinch.id,
-            doctor_id=dr_emily.id,
+            doctor_id=dr_jasur.id,
             service_id=services_map["Dermatology"].id,
             start_time=datetime.combine(today + timedelta(days=1), time(11, 30)),
             end_time=datetime.combine(today + timedelta(days=1), time(12, 15)),
@@ -339,7 +466,7 @@ def seed_database():
         Booking(
             booking_reference="HP-2025-9013",
             user_id=patient_behzod.id,
-            doctor_id=dr_michael.id,
+            doctor_id=dr_alisher.id,
             service_id=services_map["Cardiology"].id,
             start_time=datetime.combine(today + timedelta(days=2), time(15, 0)),
             end_time=datetime.combine(today + timedelta(days=2), time(16, 0)),
@@ -349,7 +476,7 @@ def seed_database():
         Booking(
             booking_reference="HP-2025-9014",
             user_id=patient_malika.id,
-            doctor_id=dr_james.id,
+            doctor_id=dr_shahnoza.id,
             service_id=services_map["Pediatrics"].id,
             start_time=datetime.combine(past_date1, time(9, 0)),
             end_time=datetime.combine(past_date1, time(9, 40)),
@@ -360,9 +487,9 @@ def seed_database():
 
     db.add_all(bookings_data)
     db.commit()
-    print("Database successfully seeded!")
+    print("Database successfully seeded with 10 Uzbekistani doctors!")
     db.close()
 
 
 if __name__ == "__main__":
-    seed_database()
+    seed_database(force=True)

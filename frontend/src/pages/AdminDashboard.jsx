@@ -1282,7 +1282,7 @@ export default function AdminDashboard({ onNavigate }) {
                 <input
                   type="text"
                   required
-                  placeholder="Dr. Sarah Johnson"
+                  placeholder="Dr. Alisher Usmonov"
                   value={doctorForm.full_name}
                   onChange={e => setDoctorForm({ ...doctorForm, full_name: e.target.value })}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', fontSize: '14px' }}

@@ -194,7 +194,7 @@ Open **`http://localhost:5173`** in your browser.
 |------|-------|----------|---------|
 | **Patient (Alex)** | `alex@healthplus.com` | `password123` | Patient from mockup with active & past appointments |
 | **Clinic Administrator** | `admin@healthplus.com` | `admin123` | Full access to React Admin & Flask-Admin |
-| **Doctor (Dr. Sarah Johnson)** | `sarah.johnson@healthplus.com` | `doctor123` | General Practitioner with pre-set schedules |
+| **Doctor (Dr. Nodira Karimova)** | `nodira.karimova@healthplus.com` | `doctor123` | Umumiy amaliyot shifokori (General Practitioner) with pre-set schedules |
 
 *(Note: The login dialog features 1-click quick login buttons for Alex and Admin to allow instant evaluation without typing!)*
 

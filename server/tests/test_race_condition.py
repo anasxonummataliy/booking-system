@@ -66,12 +66,11 @@ async def test_concurrent_double_booking_prevention(client, db_session, test_doc
     detail_lower = conflict_resp.json()["detail"].lower()
     assert "booked" in detail_lower or "conflict" in detail_lower or "available" in detail_lower
 
-    # 4. Check DB records count for this slot using a clean session
-    from app.database import SessionLocal
-    with SessionLocal() as check_db:
-        slot_bookings = check_db.query(Booking).filter(
-            Booking.doctor_id == test_doctor.id,
-            Booking.start_time == target_slot,
-            Booking.status != "Cancelled"
-        ).all()
-        assert len(slot_bookings) == 1, f"There should be exactly one active booking in the DB, not {len(slot_bookings)}!"
+    # 4. Check DB records count for this slot using db_session
+    slot_bookings = db_session.query(Booking).filter(
+        Booking.doctor_id == test_doctor.id,
+        Booking.start_time == target_slot,
+        Booking.status != "Cancelled"
+    ).all()
+    assert len(slot_bookings) == 1, f"There should be exactly one active booking in the DB, not {len(slot_bookings)}!"
+

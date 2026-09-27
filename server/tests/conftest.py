@@ -1,34 +1,63 @@
 import os
 import uuid
+from datetime import time
 import pytest
-from datetime import datetime, time, timedelta, timezone, date
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from app.database import SessionLocal, Base, engine
-from app.core.security import hash_password, create_access_token
-from app.database.models import User, Service, Doctor, DoctorSchedule, Booking, BookingStatus, UserRole
+from app.api.deps import get_db
+from app.core.security import create_access_token, hash_password
+from app.database import Base
+from app.database.models import (
+    Doctor,
+    DoctorSchedule,
+    Service,
+    User,
+    UserRole,
+)
 from app.main import app
+
+# Isolated SQLite database specifically for automated tests
+TEST_DATABASE_URL = "sqlite:///./test_healthplus.db"
+test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
 
 @pytest.fixture(scope="session", autouse=True)
-def init_db():
-    Base.metadata.create_all(bind=engine)
+def init_test_db():
+    Base.metadata.create_all(bind=test_engine)
     yield
-
-
-@pytest.fixture
-def client():
-    with TestClient(app) as c:
-        yield c
+    Base.metadata.drop_all(bind=test_engine)
+    test_db_path = os.path.abspath("./test_healthplus.db")
+    if os.path.exists(test_db_path):
+        try:
+            os.remove(test_db_path)
+        except OSError:
+            pass
 
 
 @pytest.fixture
 def db_session():
-    db = SessionLocal()
+    db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+@pytest.fixture
+def client(db_session):
+    def override_get_db():
+        try:
+            yield db_session
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
@@ -40,7 +69,7 @@ def test_user(db_session) -> User:
         phone="+998901112233",
         hashed_password=hash_password("password123"),
         role=UserRole.USER.value,
-        is_active=True
+        is_active=True,
     )
     db_session.add(user)
     db_session.commit()
@@ -62,7 +91,7 @@ def test_admin_user(db_session) -> User:
         phone="+998909998877",
         hashed_password=hash_password("admin123"),
         role=UserRole.ADMIN.value,
-        is_active=True
+        is_active=True,
     )
     db_session.add(admin)
     db_session.commit()
@@ -83,7 +112,7 @@ def test_service(db_session) -> Service:
         description="Comprehensive physical exam and health check.",
         duration=30,
         price=30.0,
-        icon="stethoscope"
+        icon="stethoscope",
     )
     db_session.add(service)
     db_session.commit()
@@ -106,7 +135,7 @@ def test_doctor(db_session, test_service) -> Doctor:
         avatar_url="https://images.unsplash.com/photo-1559839734-2b71ea197ec2",
         education="Test Medical University",
         languages="English, Uzbek",
-        location="Clinic Room 101"
+        location="Clinic Room 101",
     )
     db_session.add(doctor)
     db_session.commit()
@@ -120,7 +149,7 @@ def test_doctor(db_session, test_service) -> Doctor:
             end_time=time(17, 0),
             break_start=time(13, 0),
             break_end=time(14, 0),
-            slot_duration_minutes=30
+            slot_duration_minutes=30,
         )
         db_session.add(sched)
     db_session.commit()
