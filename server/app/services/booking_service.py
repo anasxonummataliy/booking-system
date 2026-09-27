@@ -185,6 +185,12 @@ class BookingService:
                 status_code=400, detail=f"Invalid status. Choose from: {valid_statuses}"
             )
 
+        if booking.status == BookingStatus.COMPLETED.value and new_status == BookingStatus.CANCELLED.value:
+            raise HTTPException(
+                status_code=400,
+                detail="Yakunlangan qabulni bekor qilib bo'lmaydi / Cannot cancel an already completed appointment",
+            )
+
         booking.status = new_status
         if reason:
             booking.cancellation_reason = reason

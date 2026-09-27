@@ -1038,25 +1038,30 @@ export default function AdminDashboard({ onNavigate }) {
                           {renderBadge(b.status)}
                         </td>
                         <td style={{ padding: '14px 20px' }}>
-                          {b.status === 'Pending' && (
-                            <button
-                              onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
-                              disabled={actionLoadingId === b.id}
-                              className="btn-primary"
-                              style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px' }}
-                            >
-                              {t('confirm')}
-                            </button>
-                          )}
-                          {b.status === 'Confirmed' && (
-                            <button
-                              onClick={() => handleUpdateStatus(b.id, 'Completed')}
-                              disabled={actionLoadingId === b.id}
-                              style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
-                            >
-                              {t('statusCompleted')}
-                            </button>
-                          )}
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {b.status === 'Pending' && (
+                              <button
+                                onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
+                                disabled={actionLoadingId === b.id}
+                                className="btn-primary"
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px' }}
+                              >
+                                {t('confirm')}
+                              </button>
+                            )}
+                            {b.status === 'Confirmed' && (
+                              <button
+                                onClick={() => handleUpdateStatus(b.id, 'Completed')}
+                                disabled={actionLoadingId === b.id}
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
+                              >
+                                {t('statusCompleted')}
+                              </button>
+                            )}
+                            {(b.status === 'Completed' || b.status === 'Cancelled') && (
+                              <span style={{ fontSize: '13px', color: '#94A3B8' }}>—</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1195,7 +1200,7 @@ export default function AdminDashboard({ onNavigate }) {
                                 {t('statusCompleted')}
                               </button>
                             )}
-                            {b.status !== 'Cancelled' && (
+                            {(b.status === 'Pending' || b.status === 'Confirmed') && (
                               <button
                                 onClick={() => handleUpdateStatus(b.id, 'Cancelled')}
                                 disabled={actionLoadingId === b.id}
@@ -1204,6 +1209,9 @@ export default function AdminDashboard({ onNavigate }) {
                               >
                                 {t('cancel')}
                               </button>
+                            )}
+                            {(b.status === 'Completed' || b.status === 'Cancelled') && (
+                              <span style={{ fontSize: '13px', color: '#94A3B8' }}>—</span>
                             )}
                           </div>
                         </td>
