@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_admin, get_db
 from app.database.models import User
-from app.schemas.doctor import DoctorCreate, DoctorDetailOut, DoctorOut
+from app.schemas.doctor import DoctorCreate, DoctorDetailOut, DoctorOut, DoctorUpdate
+from app.schemas.schedule import ScheduleCreate, ScheduleOut
 from app.services.booking_service import BookingService
 from app.services.catalog_service import CatalogService
 
@@ -49,3 +50,41 @@ def create_doctor(
 ):
     catalog = CatalogService(db)
     return catalog.create_doctor(data)
+
+
+@router.put("/{id}", response_model=DoctorOut)
+def update_doctor(
+    id: int,
+    data: DoctorUpdate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    catalog = CatalogService(db)
+    return catalog.update_doctor(id, data)
+
+
+@router.delete("/{id}")
+def delete_doctor(
+    id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)
+):
+    catalog = CatalogService(db)
+    catalog.delete_doctor(id)
+    return {"message": "Doctor successfully deleted"}
+
+
+@router.get("/{id}/schedules", response_model=list[ScheduleOut])
+def get_doctor_schedules(id: int, db: Session = Depends(get_db)):
+    catalog = CatalogService(db)
+    return catalog.list_schedules(id)
+
+
+@router.post("/{id}/schedules", response_model=ScheduleOut)
+def create_or_update_schedule(
+    id: int,
+    data: ScheduleCreate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    data.doctor_id = id
+    catalog = CatalogService(db)
+    return catalog.create_or_update_schedule(data)

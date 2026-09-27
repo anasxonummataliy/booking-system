@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_admin, get_db
 from app.database.models import User
-from app.schemas.service import ServiceCreate, ServiceOut
+from app.schemas.service import ServiceCreate, ServiceOut, ServiceUpdate
 from app.services.catalog_service import CatalogService
 
 router = APIRouter(prefix="/services", tags=["Services"])
@@ -27,3 +27,23 @@ def create_service(
 ):
     service = CatalogService(db)
     return service.create_service(data)
+
+
+@router.put("/{id}", response_model=ServiceOut)
+def update_service(
+    id: int,
+    data: ServiceUpdate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    service = CatalogService(db)
+    return service.update_service(id, data)
+
+
+@router.delete("/{id}")
+def delete_service(
+    id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)
+):
+    service = CatalogService(db)
+    service.delete_service(id)
+    return {"message": "Service successfully deleted"}

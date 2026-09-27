@@ -64,4 +64,16 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ status: newStatus, cancellation_reason: reason }),
     }),
+
+  // Service Management
+  createService: (payload) => request('/services', { method: 'POST', body: JSON.stringify(payload) }),
+  updateService: (id, payload) => request(`/services/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteService: (id) => request(`/services/${id}`, { method: 'DELETE' }),
+
+  // Doctor Management
+  createDoctor: (payload) => request('/doctors', { method: 'POST', body: JSON.stringify(payload) }),
+  updateDoctor: (id, payload) => request(`/doctors/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteDoctor: (id) => request(`/doctors/${id}`, { method: 'DELETE' }),
+  getDoctorSchedules: (id) => request(`/doctors/${id}/schedules`),
+  setDoctorSchedule: (id, payload) => request(`/doctors/${id}/schedules`, { method: 'POST', body: JSON.stringify(payload) }),
 };
