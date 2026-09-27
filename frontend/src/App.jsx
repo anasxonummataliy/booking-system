@@ -51,10 +51,12 @@ function AppContent() {
     setConfirmationModalOpen(true);
   };
 
-  // If authenticated as admin, ONLY show AdminDashboard (no patient navbar/bottom nav/drawer)
-  if (isAuthenticated && isAdmin) {
-    return <AdminDashboard onNavigate={setActivePage} />;
-  }
+  // When logged in as admin on home, open admin dashboard
+  React.useEffect(() => {
+    if (isAuthenticated && isAdmin && activePage === 'home') {
+      setActivePage('admin');
+    }
+  }, [isAuthenticated, isAdmin]);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
