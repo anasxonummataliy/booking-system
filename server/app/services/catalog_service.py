@@ -1,11 +1,11 @@
-from typing import List, Optional
-from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.repositories.service_repository import ServiceRepository
+from sqlalchemy.orm import Session
+
+from app.database.models import Doctor, Service
 from app.repositories.doctor_repository import DoctorRepository
-from app.database.models import Service, Doctor
-from app.schemas.service import ServiceCreate, ServiceUpdate
-from app.schemas.doctor import DoctorCreate, DoctorUpdate
+from app.repositories.service_repository import ServiceRepository
+from app.schemas.doctor import DoctorCreate
+from app.schemas.service import ServiceCreate
 
 
 class CatalogService:
@@ -13,7 +13,7 @@ class CatalogService:
         self.service_repo = ServiceRepository(db)
         self.doctor_repo = DoctorRepository(db)
 
-    def list_services(self) -> List[Service]:
+    def list_services(self) -> list[Service]:
         return self.service_repo.get_active_services()
 
     def get_service(self, service_id: int) -> Service:
@@ -29,7 +29,7 @@ class CatalogService:
         new_svc = Service(**data.model_dump())
         return self.service_repo.create(new_svc)
 
-    def list_doctors(self, specialty: Optional[str] = None) -> List[Doctor]:
+    def list_doctors(self, specialty: str | None = None) -> list[Doctor]:
         return self.doctor_repo.get_all_with_service(specialty=specialty)
 
     def get_doctor(self, doctor_id: int) -> Doctor:

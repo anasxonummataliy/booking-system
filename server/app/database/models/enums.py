@@ -1,13 +1,13 @@
-import enum
+from enum import StrEnum
 
 
-class UserRole(str, enum.Enum):
+class UserRole(StrEnum):
     USER = "user"
     DOCTOR = "doctor"
     ADMIN = "admin"
 
 
-class BookingStatus(str, enum.Enum):
+class BookingStatus(StrEnum):
     PENDING = "Pending"
     CONFIRMED = "Confirmed"
     CANCELLED = "Cancelled"

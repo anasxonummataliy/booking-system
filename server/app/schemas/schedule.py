@@ -1,14 +1,14 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
 from datetime import time
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ScheduleBase(BaseModel):
     day_of_week: int = Field(..., ge=0, le=6, description="0=Monday, 6=Sunday")
     start_time: time
     end_time: time
-    break_start: Optional[time] = None
-    break_end: Optional[time] = None
+    break_start: time | None = None
+    break_end: time | None = None
     slot_duration_minutes: int = 30
     is_active: bool = True
 

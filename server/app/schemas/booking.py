@@ -1,21 +1,22 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
 from datetime import datetime
-from app.schemas.user import UserOut
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.schemas.doctor import DoctorOut
 from app.schemas.service import ServiceOut
+from app.schemas.user import UserOut
 
 
 class BookingCreate(BaseModel):
     doctor_id: int
     service_id: int
     start_time: datetime
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class BookingUpdateStatus(BaseModel):
     status: str = Field(..., description="Pending, Confirmed, Cancelled, Completed")
-    cancellation_reason: Optional[str] = None
+    cancellation_reason: str | None = None
 
 
 class BookingOut(BaseModel):
@@ -28,14 +29,14 @@ class BookingOut(BaseModel):
     end_time: datetime
     status: str
     total_price: float
-    notes: Optional[str] = None
-    cancellation_reason: Optional[str] = None
+    notes: str | None = None
+    cancellation_reason: str | None = None
     created_at: datetime
     updated_at: datetime
 
-    user: Optional[UserOut] = None
-    doctor: Optional[DoctorOut] = None
-    service: Optional[ServiceOut] = None
+    user: UserOut | None = None
+    doctor: DoctorOut | None = None
+    service: ServiceOut | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

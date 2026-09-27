@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
+
+from a2wsgi import WSGIMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from a2wsgi import WSGIMiddleware
 
+from app.admin.flask_admin_app import create_flask_admin_app
+from app.api.router import api_router
 from app.core.config import settings
 from app.database import Base, engine
-from app.api.router import api_router
-from app.admin.flask_admin_app import create_flask_admin_app
 from app.seed import seed_database
 
 
@@ -27,7 +28,7 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # CORS middleware
@@ -53,5 +54,5 @@ def root():
         "app": settings.PROJECT_NAME,
         "status": "online",
         "api_docs": "/docs",
-        "admin_panel": "/admin"
+        "admin_panel": "/admin",
     }

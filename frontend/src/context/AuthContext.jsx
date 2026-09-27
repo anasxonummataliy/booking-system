@@ -8,6 +8,12 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('healthplus_token') || null);
   const [loading, setLoading] = useState(true);
 
+  const logout = () => {
+    localStorage.removeItem('healthplus_token');
+    setToken(null);
+    setUser(null);
+  };
+
   useEffect(() => {
     async function loadUser() {
       if (token) {
@@ -40,11 +46,6 @@ export function AuthProvider({ children }) {
     return res.user;
   };
 
-  const logout = () => {
-    localStorage.removeItem('healthplus_token');
-    setToken(null);
-    setUser(null);
-  };
 
   // Quick 1-click Demo Switchers for convenience
   const quickLoginAsAlex = () => login('alex@healthplus.com', 'password123');

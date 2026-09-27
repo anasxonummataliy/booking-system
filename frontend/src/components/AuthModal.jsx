@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }) {
   const { login, register, quickLoginAsAlex, quickLoginAsAdmin } = useAuth();

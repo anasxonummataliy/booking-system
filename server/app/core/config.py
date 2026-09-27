@@ -1,35 +1,30 @@
 import os
-from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "HealthPlus - Doctor Appointment Booking System"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-healthplus-jwt-key-2026-production-ready")
+    SECRET_KEY: str = os.getenv(
+        "SECRET_KEY", "super-secret-healthplus-jwt-key-2026-production-ready"
+    )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     # PostgreSQL Database URL with SQLite fallback for local development if Postgres is not running
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///./healthplus.db"
-    )
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./healthplus.db")
 
     # CORS origins
-    BACKEND_CORS_ORIGINS: List[str] = [
+    BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "*"
+        "*",
     ]
 
-    model_config = SettingsConfigDict(
-        case_sensitive=True,
-        env_file=".env",
-        extra="allow"
-    )
+    model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra="allow")
 
 
 settings = Settings()

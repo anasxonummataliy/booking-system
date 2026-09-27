@@ -4,21 +4,16 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   Calendar,
-  Layers,
-  Users,
-  Settings,
   LogOut,
   ExternalLink,
-  CheckCircle,
   Clock,
   XCircle,
   TrendingUp,
-  Activity,
   Plus
 } from 'lucide-react';
 
 export default function AdminDashboard({ onNavigate }) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const [metrics, setMetrics] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -4,14 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft,
   Star,
-  Globe,
-  DollarSign,
-  GraduationCap,
-  Award,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  Calendar as CalendarIcon,
   AlertCircle
 } from 'lucide-react';
 
@@ -39,7 +33,6 @@ export default function DoctorBookingPage({
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState('');
-  const [step, setStep] = useState(2); // 1: Select Doc (done), 2: Choose Time, 3: Confirm
 
   // Fetch slots whenever selectedDate changes
   useEffect(() => {

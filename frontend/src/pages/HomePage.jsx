@@ -5,14 +5,10 @@ import {
   Heart,
   Baby,
   Activity,
-  Calendar,
   Search,
   ArrowRight,
   ShieldCheck,
-  Clock,
-  Award,
-  Star,
-  Users
+  Star
 } from 'lucide-react';
 
 export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }) {

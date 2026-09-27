@@ -8,13 +8,10 @@ import {
   FileText,
   User,
   LogOut,
-  Clock,
-  MapPin,
-  AlertCircle,
   Plus
 } from 'lucide-react';
 
-export default function UserDashboard({ onNavigate, onSelectDoctor }) {
+export default function UserDashboard({ onNavigate }) {
   const { user, logout } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

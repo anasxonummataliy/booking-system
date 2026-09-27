@@ -1,21 +1,21 @@
-from pydantic import BaseModel, EmailStr, ConfigDict
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
-    phone: Optional[str] = None
+    phone: str | None = None
     role: str = "user"
 
 
 class UserCreate(BaseModel):
     email: EmailStr
     full_name: str
-    phone: Optional[str] = None
+    phone: str | None = None
     password: str
-    role: Optional[str] = "user"
+    role: str | None = "user"
 
 
 class UserLogin(BaseModel):
@@ -38,4 +38,4 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[str] = None
+    sub: str | None = None

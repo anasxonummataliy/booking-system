@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { ArrowLeft, Search, Star, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Search, Star } from 'lucide-react';
 
 const SPECIALTIES = ['All', 'General', 'Cardiology', 'Dermatology', 'Pediatrics', 'Gynecology'];
 

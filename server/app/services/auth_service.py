@@ -1,10 +1,10 @@
-from typing import Optional
-from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from app.repositories.user_repository import UserRepository
+from sqlalchemy.orm import Session
+
+from app.core.security import create_access_token, hash_password, verify_password
 from app.database.models import User, UserRole
+from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserLogin
-from app.core.security import hash_password, verify_password, create_access_token
 
 
 class AuthService:
@@ -16,7 +16,7 @@ class AuthService:
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A user with this email address already exists."
+                detail="A user with this email address already exists.",
             )
 
         hashed = hash_password(data.password)
@@ -26,32 +26,23 @@ class AuthService:
             phone=data.phone,
             hashed_password=hashed,
             role=data.role or UserRole.USER.value,
-            is_active=True
+            is_active=True,
         )
         created_user = self.user_repo.create(new_user)
         access_token = create_access_token(subject=str(created_user.id))
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": created_user
-        }
+        return {"access_token": access_token, "token_type": "bearer", "user": created_user}
 
     def login(self, data: UserLogin) -> dict:
         user = self.user_repo.get_by_email(data.email)
         if not user or not verify_password(data.password, user.hashed_password):
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password."
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password."
             )
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Your user account has been deactivated."
+                detail="Your user account has been deactivated.",
             )
 
         access_token = create_access_token(subject=str(user.id))
-        return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": user
-        }
+        return {"access_token": access_token, "token_type": "bearer", "user": user}

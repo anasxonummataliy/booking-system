@@ -11,7 +11,7 @@ import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 function AppContent() {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   // Page navigation state: 'home' | 'services' | 'doctors' | 'doctor-booking' | 'dashboard' | 'admin'
   const [activePage, setActivePage] = useState('home');
@@ -37,7 +37,7 @@ function AppContent() {
     setActivePage('doctor-booking');
   };
 
-  const handleSelectService = (serviceId) => {
+  const handleSelectService = () => {
     setActivePage('doctors');
   };
 

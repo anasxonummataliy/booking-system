@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ServiceBase(BaseModel):
@@ -8,8 +8,8 @@ class ServiceBase(BaseModel):
     description: str = Field(..., description="Service description")
     duration: int = Field(..., gt=0, description="Duration in minutes")
     price: float = Field(..., ge=0, description="Cost in USD")
-    icon: Optional[str] = "stethoscope"
-    is_active: Optional[bool] = True
+    icon: str | None = "stethoscope"
+    is_active: bool | None = True
 
 
 class ServiceCreate(ServiceBase):
@@ -17,12 +17,12 @@ class ServiceCreate(ServiceBase):
 
 
 class ServiceUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    duration: Optional[int] = None
-    price: Optional[float] = None
-    icon: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    duration: int | None = None
+    price: float | None = None
+    icon: str | None = None
+    is_active: bool | None = None
 
 
 class ServiceOut(ServiceBase):

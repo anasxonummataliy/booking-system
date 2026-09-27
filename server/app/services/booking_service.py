@@ -1,15 +1,19 @@
 import uuid
-from datetime import datetime, date, time, timedelta, timezone
-from typing import List, Dict, Any, Optional
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from datetime import date, datetime, time, timedelta
+from typing import Any
 
-from app.database.models import Booking, BookingStatus, Doctor, Service, DoctorSchedule
-from app.repositories.booking_repository import BookingRepository, SlotAlreadyBookedException
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database.models import Booking, BookingStatus
+from app.repositories.booking_repository import (
+    BookingRepository,
+    SlotAlreadyBookedException,
+)
 from app.repositories.doctor_repository import DoctorRepository
-from app.repositories.service_repository import ServiceRepository
 from app.repositories.schedule_repository import ScheduleRepository
-from app.schemas.booking import BookingCreate, AdminStats
+from app.repositories.service_repository import ServiceRepository
+from app.schemas.booking import BookingCreate
 
 
 class BookingService:
@@ -20,7 +24,7 @@ class BookingService:
         self.service_repo = ServiceRepository(db)
         self.schedule_repo = ScheduleRepository(db)
 
-    def get_available_slots(self, doctor_id: int, target_date: date) -> List[Dict[str, Any]]:
+    def get_available_slots(self, doctor_id: int, target_date: date) -> list[dict[str, Any]]:
         doctor = self.doctor_repo.get(doctor_id)
         if not doctor:
             raise HTTPException(status_code=404, detail="Doctor not found")
@@ -29,7 +33,8 @@ class BookingService:
         day_of_week = target_date.weekday()
         schedule = self.schedule_repo.get_by_doctor_and_day(doctor_id, day_of_week)
 
-        # If doctor doesn't have an explicit schedule for this day, default to 09:00 - 17:00 (Mon-Sat)
+        # If doctor doesn't have an explicit schedule for this day,
+        # default to 09:00 - 17:00 (Mon-Sat)
         if not schedule:
             if day_of_week == 6:  # Sunday closed by default
                 return []
@@ -86,13 +91,17 @@ class BookingService:
 
             is_available = (not is_break) and (not is_booked) and (not is_past)
 
-            slots.append({
-                "start_time": slot_start.isoformat(),
-                "end_time": slot_end.isoformat(),
-                "display_time": slot_start.strftime("%I:%M %p"),
-                "is_available": is_available,
-                "reason": "booked" if is_booked else ("break" if is_break else ("past" if is_past else "available"))
-            })
+            slots.append(
+                {
+                    "start_time": slot_start.isoformat(),
+                    "end_time": slot_end.isoformat(),
+                    "display_time": slot_start.strftime("%I:%M %p"),
+                    "is_available": is_available,
+                    "reason": "booked"
+                    if is_booked
+                    else ("break" if is_break else ("past" if is_past else "available")),
+                }
+            )
 
             current_time_dt += timedelta(minutes=slot_duration)
 
@@ -130,32 +139,32 @@ class BookingService:
             end_time=end_time,
             status=BookingStatus.CONFIRMED.value,
             total_price=total_price,
-            notes=data.notes
+            notes=data.notes,
         )
 
         try:
             created = self.booking_repo.create_booking_with_concurrency_lock(new_booking)
             return created
         except SlotAlreadyBookedException as e:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=str(e)
-            )
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
 
-    def cancel_booking(self, booking_id: int, user_id: int, is_admin: bool = False, reason: Optional[str] = None) -> Booking:
+    def cancel_booking(
+        self, booking_id: int, user_id: int, is_admin: bool = False, reason: str | None = None
+    ) -> Booking:
         booking = self.booking_repo.get(booking_id)
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found")
 
         # Permission check: must be owner or admin
         if not is_admin and booking.user_id != user_id:
-            raise HTTPException(status_code=403, detail="You do not have permission to cancel this booking")
+            raise HTTPException(
+                status_code=403, detail="You do not have permission to cancel this booking"
+            )
 
         # Cancellation policy: cannot cancel already completed bookings
         if booking.status == BookingStatus.COMPLETED.value:
             raise HTTPException(
-                status_code=400,
-                detail="Completed appointments cannot be cancelled."
+                status_code=400, detail="Completed appointments cannot be cancelled."
             )
 
         if booking.status == BookingStatus.CANCELLED.value:
@@ -165,21 +174,23 @@ class BookingService:
         booking.cancellation_reason = reason or "Cancelled by user"
         return self.booking_repo.update(booking)
 
-    def update_status(self, booking_id: int, new_status: str, reason: Optional[str] = None) -> Booking:
+    def update_status(self, booking_id: int, new_status: str, reason: str | None = None) -> Booking:
         booking = self.booking_repo.get(booking_id)
         if not booking:
             raise HTTPException(status_code=404, detail="Booking not found")
 
         valid_statuses = [s.value for s in BookingStatus]
         if new_status not in valid_statuses:
-            raise HTTPException(status_code=400, detail=f"Invalid status. Choose from: {valid_statuses}")
+            raise HTTPException(
+                status_code=400, detail=f"Invalid status. Choose from: {valid_statuses}"
+            )
 
         booking.status = new_status
         if reason:
             booking.cancellation_reason = reason
         return self.booking_repo.update(booking)
 
-    def get_admin_metrics(self) -> Dict[str, Any]:
+    def get_admin_metrics(self) -> dict[str, Any]:
         total = self.booking_repo.db.query(Booking).count()
         confirmed = self.booking_repo.count_by_status(BookingStatus.CONFIRMED.value)
         pending = self.booking_repo.count_by_status(BookingStatus.PENDING.value)
@@ -187,9 +198,13 @@ class BookingService:
         completed = self.booking_repo.count_by_status(BookingStatus.COMPLETED.value)
 
         # Calculate revenue from confirmed and completed bookings
-        bookings = self.booking_repo.db.query(Booking).filter(
-            Booking.status.in_([BookingStatus.CONFIRMED.value, BookingStatus.COMPLETED.value])
-        ).all()
+        bookings = (
+            self.booking_repo.db.query(Booking)
+            .filter(
+                Booking.status.in_([BookingStatus.CONFIRMED.value, BookingStatus.COMPLETED.value])
+            )
+            .all()
+        )
         total_revenue = sum(b.total_price for b in bookings)
 
         # Overview curve for last 7 days
@@ -199,14 +214,12 @@ class BookingService:
             d = today - timedelta(days=i)
             day_start = datetime.combine(d, time.min)
             day_end = datetime.combine(d, time.max)
-            count = self.booking_repo.db.query(Booking).filter(
-                Booking.created_at >= day_start,
-                Booking.created_at <= day_end
-            ).count()
-            chart_data.append({
-                "date": d.strftime("%b %d"),
-                "bookings": count
-            })
+            count = (
+                self.booking_repo.db.query(Booking)
+                .filter(Booking.created_at >= day_start, Booking.created_at <= day_end)
+                .count()
+            )
+            chart_data.append({"date": d.strftime("%b %d"), "bookings": count})
 
         return {
             "total_bookings": total,
@@ -215,5 +228,5 @@ class BookingService:
             "cancelled_bookings": cancelled,
             "completed_bookings": completed,
             "total_revenue": total_revenue,
-            "chart_data": chart_data
+            "chart_data": chart_data,
         }

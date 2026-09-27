@@ -16,8 +16,27 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
   });
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '480px', textAlign: 'center', padding: '36px 32px' }}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-content"
+        style={{ maxWidth: '480px', textAlign: 'center', padding: '36px 32px', position: 'relative' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--text-muted)'
+          }}
+          aria-label="Close modal"
+        >
+          <X size={20} />
+        </button>
         {/* Green Checkmark Circle */}
         <div style={{
           width: '64px',

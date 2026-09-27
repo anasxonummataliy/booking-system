@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, User, LogOut, LayoutDashboard, Shield, Calendar } from 'lucide-react';
+import { Plus, LogOut, LayoutDashboard, Shield, Calendar } from 'lucide-react';
 
 export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
-  const { user, isAuthenticated, isAdmin, logout, quickLoginAsAlex, quickLoginAsAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
