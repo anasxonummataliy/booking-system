@@ -404,11 +404,7 @@ export default function AdminDashboard({ onNavigate }) {
 
           {/* Logout (Desktop) */}
           <button
-            onClick={() => {
-              if (window.confirm(t('logoutConfirm'))) {
-                logout();
-              }
-            }}
+            onClick={() => logout()}
             className="desktop-only"
             style={{
               display: 'flex',
@@ -643,10 +639,8 @@ export default function AdminDashboard({ onNavigate }) {
             <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
               <button
                 onClick={() => {
-                  if (window.confirm(t('logoutConfirm'))) {
-                    logout();
-                    setAdminDrawerOpen(false);
-                  }
+                  logout();
+                  setAdminDrawerOpen(false);
                 }}
                 style={{
                   display: 'flex',
@@ -866,11 +860,7 @@ export default function AdminDashboard({ onNavigate }) {
             </div>
           </div>
           <button
-            onClick={() => {
-              if (window.confirm(t('logoutConfirm'))) {
-                logout();
-              }
-            }}
+            onClick={() => logout()}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1554,11 +1544,7 @@ export default function AdminDashboard({ onNavigate }) {
             </div>
           </div>
           <button
-            onClick={() => {
-              if (window.confirm(t('logoutConfirm'))) {
-                logout();
-              }
-            }}
+            onClick={() => logout()}
             style={{
               display: 'flex',
               alignItems: 'center',
