@@ -1,6 +1,6 @@
 # 🏥 HealthPlus - Modern Doctor Appointment Booking System
 
-> **A production-ready Doctor Appointment Booking System for healthcare & service businesses** built with **FastAPI (Clean Architecture & Repository Pattern)**, **PostgreSQL (Docker)**, **Flask-Admin Panel**, and **React (Vite)** with custom UI aesthetics matching the HealthPlus telemedicine specification.
+> **A production-ready Doctor Appointment Booking System for healthcare & service businesses** built with **FastAPI (Clean Architecture & Repository Pattern)**, **SQLite (Primary Database)**, **Custom In-App Admin Dashboard**, and **React (Vite)** with custom UI aesthetics matching the HealthPlus telemedicine specification.
 
 ---
 
@@ -11,9 +11,7 @@ HealthPlus offers a complete patient and administrative booking experience:
 3. **Doctor Availability & Slot Generation:** Real-time generation of 30-min time slots accounting for working hours, breaks, and existing bookings.
 4. **Race-Condition-Free Booking Stepper:** 3-step checkout with instant conflict prevention.
 5. **Patient Dashboard:** Upcoming appointments, real-time status tracking (`Confirmed`, `Pending`, `Cancelled`, `Completed`), and one-click cancellation.
-6. **Dual Admin Panels:**
-   - **React Clinic Dashboard:** Live KPI cards, 7-day bookings overview curve, and appointment state controls.
-   - **Flask-Admin Panel (`/admin`):** Direct relational CRUD interface over SQLAlchemy models mounted seamlessly onto FastAPI via WSGI middleware.
+6. **Custom In-App Admin Portal:** Live KPI metrics, appointments filter/status actions, full CRUD on Services, Doctors, and weekly Work Schedules.
 
 ---
 

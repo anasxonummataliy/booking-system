@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
-    # PostgreSQL Database URL with SQLite fallback for local development if Postgres is not running
+    # Primary Database: SQLite (zero-config, high performance, self-contained)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./healthplus.db")
 
     # CORS origins
