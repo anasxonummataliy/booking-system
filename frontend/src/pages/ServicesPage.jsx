@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, ChevronRight, Stethoscope, Heart, Baby, Activity, Bone, Shield, Clock } from 'lucide-react';
 
 export default function ServicesPage({ onBack, onSelectService }) {
+  const { t } = useLanguage();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,20 +50,20 @@ export default function ServicesPage({ onBack, onSelectService }) {
               marginBottom: '16px'
             }}
           >
-            <ArrowLeft size={18} /> Back
+            <ArrowLeft size={18} /> {t('back')}
           </button>
           <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
-            Our Services
+            {t('servicesHeaderTitle')}
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Choose a service you want to book
+            {t('servicesHeaderSubtitle')}
           </p>
         </div>
 
         {/* Services List */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-            Loading medical services...
+            {t('loading')}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -114,7 +116,7 @@ export default function ServicesPage({ onBack, onSelectService }) {
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', fontWeight: 600 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-                        <Clock size={14} /> {svc.duration} min
+                        <Clock size={14} /> {svc.duration} {t('mins')}
                       </span>
                       <span style={{ color: 'var(--primary)', fontWeight: 700 }}>
                         ${svc.price}

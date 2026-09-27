@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Stethoscope,
   Heart,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }) {
+  const { t } = useLanguage();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedServiceId, setSelectedServiceId] = useState('');
@@ -84,7 +86,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 fontWeight: 700,
                 marginBottom: '18px'
               }}>
-                <ShieldCheck size={16} /> Your Health, Our Priority
+                <ShieldCheck size={16} /> {t('heroBadge')}
               </div>
 
               <h1 style={{
@@ -95,8 +97,8 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 letterSpacing: '-1px',
                 marginBottom: '16px'
               }}>
-                Book Your Doctor <br />
-                <span style={{ color: 'var(--primary)' }}>Appointment</span> Online
+                {t('heroTitle')} <br />
+                <span style={{ color: 'var(--primary)' }}>{t('heroTitleHighlight')}</span>
               </h1>
 
               <p style={{
@@ -106,8 +108,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 maxWidth: '520px',
                 marginBottom: '32px'
               }}>
-                Get quality healthcare, faster. Find the right specialist, choose a convenient time,
-                and confirm your appointment in just a few clicks.
+                {t('heroSubtitle')}
               </p>
 
               {/* Floating Quick Search Bar Card */}
@@ -125,7 +126,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 {/* Select Service */}
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Select Service
+                    {t('searchServicePlaceholder')}
                   </label>
                   <select
                     value={selectedServiceId}
@@ -140,7 +141,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                       backgroundColor: 'transparent'
                     }}
                   >
-                    <option value="">All Services</option>
+                    <option value="">{t('allServicesOption')}</option>
                     {services.map(s => (
                       <option key={s.id} value={s.id}>{s.name} (${s.price})</option>
                     ))}
@@ -150,7 +151,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 {/* Choose Doctor */}
                 <div style={{ borderLeft: '1px solid var(--border-light)', paddingLeft: '12px' }}>
                   <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Choose Doctor (optional)
+                    {t('searchDoctorPlaceholder')}
                   </label>
                   <select
                     value={selectedDoctorId}
@@ -165,7 +166,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                       backgroundColor: 'transparent'
                     }}
                   >
-                    <option value="">Any Specialist</option>
+                    <option value="">{t('allDoctorsOption')}</option>
                     {doctors.map(d => (
                       <option key={d.id} value={d.id}>{d.full_name} ({d.specialty})</option>
                     ))}
@@ -175,7 +176,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 {/* Select Date */}
                 <div style={{ borderLeft: '1px solid var(--border-light)', paddingLeft: '12px' }}>
                   <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Select Date
+                    {t('searchDatePlaceholder')}
                   </label>
                   <input
                     type="date"
@@ -200,7 +201,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                   className="btn-primary"
                   style={{ padding: '12px 24px', borderRadius: 'var(--radius-md)' }}
                 >
-                  <Search size={16} /> Search
+                  <Search size={16} /> {t('searchButton')}
                 </button>
               </div>
             </div>
@@ -262,9 +263,9 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
             <div>
-              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>Popular Services</h2>
+              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>{t('popularServicesTitle')}</h2>
               <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Expert medical consultation across diverse specializations
+                {t('popularServicesSubtitle')}
               </p>
             </div>
             <button
@@ -278,7 +279,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 gap: '6px'
               }}
             >
-              View all services <ArrowRight size={16} />
+              {t('viewAllServices')} <ArrowRight size={16} />
             </button>
           </div>
 
@@ -339,7 +340,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                   borderRadius: 'var(--radius-full)',
                   display: 'inline-block'
                 }}>
-                  ${service.price} • {service.duration} min
+                  ${service.price} • {service.duration} {t('mins')}
                 </div>
               </div>
             ))}
@@ -352,9 +353,9 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
             <div>
-              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>Experienced Specialists</h2>
+              <h2 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)' }}>{t('topDoctorsTitle')}</h2>
               <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Compassionate physicians certified with years of medical practice
+                {t('topDoctorsSubtitle')}
               </p>
             </div>
             <button
@@ -368,7 +369,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                 gap: '6px'
               }}
             >
-              View all doctors <ArrowRight size={16} />
+              {t('viewAllDoctors')} <ArrowRight size={16} />
             </button>
           </div>
 
@@ -410,7 +411,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                   </p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '14px' }}>
                     <div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>Consultation</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>{t('consultationFee')}</span>
                       <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>${doc.consultation_fee}</span>
                     </div>
                     <button
@@ -418,7 +419,7 @@ export default function HomePage({ onSelectDoctor, onSelectService, onNavigate }
                       className="btn-primary"
                       style={{ padding: '8px 16px', fontSize: '13px' }}
                     >
-                      Book Now
+                      {t('bookAppointmentBtn')}
                     </button>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   ArrowLeft,
   Star,
@@ -17,6 +18,7 @@ export default function DoctorBookingPage({
   onOpenAuth
 }) {
   const { isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState('about');
   
   // Calendar state
@@ -135,7 +137,7 @@ export default function DoctorBookingPage({
               color: 'var(--text-muted)'
             }}
           >
-            <ArrowLeft size={18} /> Back
+            <ArrowLeft size={18} /> {t('back')}
           </button>
 
           {/* Stepper Navigation */}
@@ -153,7 +155,7 @@ export default function DoctorBookingPage({
                 justifyContent: 'center',
                 fontWeight: 700
               }}>✓</div>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>Select Doctor</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>{t('navDoctors')}</span>
             </div>
 
             <div style={{ width: '28px', height: '1px', backgroundColor: 'var(--border-light)' }}></div>
@@ -171,7 +173,7 @@ export default function DoctorBookingPage({
                 justifyContent: 'center',
                 fontWeight: 700
               }}>2</div>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>Choose Time</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>{t('selectedTimeLabel')}</span>
             </div>
 
             <div style={{ width: '28px', height: '1px', backgroundColor: 'var(--border-light)' }}></div>
@@ -189,7 +191,7 @@ export default function DoctorBookingPage({
                 justifyContent: 'center',
                 fontWeight: 700
               }}>3</div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-muted)' }}>Confirm</span>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-muted)' }}>{t('confirm')}</span>
             </div>
           </div>
         </div>
@@ -226,9 +228,9 @@ export default function DoctorBookingPage({
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#D97706', fontWeight: 700 }}>
                     <Star size={14} fill="#D97706" /> {doctor.rating}
                   </span>
-                  <span style={{ color: 'var(--text-muted)' }}>({doctor.reviews_count} reviews)</span>
+                  <span style={{ color: 'var(--text-muted)' }}>({doctor.reviews_count} {t('reviews')})</span>
                   <span style={{ color: 'var(--border-light)' }}>•</span>
-                  <span style={{ color: 'var(--text-muted)' }}>{doctor.experience_years} years exp</span>
+                  <span style={{ color: 'var(--text-muted)' }}>{doctor.experience_years} {t('experience')}</span>
                 </div>
               </div>
             </div>
@@ -240,11 +242,11 @@ export default function DoctorBookingPage({
             {/* Quick Meta Pills */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
               <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Languages</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>{t('languages')}</span>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>{doctor.languages}</span>
               </div>
               <div style={{ backgroundColor: '#F8FAFC', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Consultation Fee</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>{t('consultationFee')}</span>
                 <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>${doctor.consultation_fee}</span>
               </div>
             </div>
@@ -264,7 +266,7 @@ export default function DoctorBookingPage({
                     textTransform: 'capitalize'
                   }}
                 >
-                  {tab}
+                  {tab === 'about' ? t('aboutDoctorTab') : (tab === 'services' ? t('navServices') : t('reviews'))}
                 </button>
               ))}
             </div>
@@ -273,15 +275,15 @@ export default function DoctorBookingPage({
             {activeTab === 'about' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
                 <div>
-                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>Education</span>
+                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>{t('education')}</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{doctor.education}</span>
                 </div>
                 <div>
-                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>Specialization</span>
+                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>{t('specialtyAll')}</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{doctor.specialty}</span>
                 </div>
                 <div>
-                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>Location</span>
+                  <span style={{ color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>{t('clinicLocation')}</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{doctor.location}</span>
                 </div>
               </div>
@@ -316,7 +318,7 @@ export default function DoctorBookingPage({
             boxShadow: 'var(--shadow-sm)'
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px' }}>
-              Book Appointment
+              {t('bookingPageTitle')}
             </h3>
 
             {/* Error banner */}
@@ -376,7 +378,10 @@ export default function DoctorBookingPage({
                 color: 'var(--text-muted)',
                 marginBottom: '8px'
               }}>
-                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+                {(language === 'uz'
+                  ? ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh']
+                  : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+                ).map(d => (
                   <div key={d} style={{ padding: '4px' }}>{d}</div>
                 ))}
               </div>
@@ -438,20 +443,20 @@ export default function DoctorBookingPage({
             <div style={{ marginBottom: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <label style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-main)' }}>
-                  Available Time Slots
+                  {t('selectTimeStep')}
                 </label>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {selectedDate.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
 
               {loadingSlots ? (
                 <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
-                  Loading available time slots...
+                  {t('loading')}
                 </div>
               ) : slots.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: '13px', backgroundColor: '#F8FAFC', borderRadius: 'var(--radius-md)' }}>
-                  No available time slots on this day. Please choose another date.
+                  {t('noSlotsAvailable')}
                 </div>
               ) : (
                 <div style={{
@@ -502,7 +507,7 @@ export default function DoctorBookingPage({
                 borderRadius: 'var(--radius-md)'
               }}
             >
-              {bookingLoading ? 'Reserving slot...' : (!isAuthenticated ? 'Sign In to Book Appointment' : `Book Appointment ($${doctor.consultation_fee})`)}
+              {bookingLoading ? t('loading') : (!isAuthenticated ? t('loginToBookAction') : `${t('confirmBookingAction')} ($${doctor.consultation_fee})`)}
             </button>
           </div>
         </div>

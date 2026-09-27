@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Calendar,
   CheckCircle,
@@ -13,6 +14,7 @@ import {
 
 export default function UserDashboard({ onNavigate }) {
   const { user, logout } = useAuth();
+  const { t, language } = useLanguage();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
@@ -34,7 +36,7 @@ export default function UserDashboard({ onNavigate }) {
   }, []);
 
   const handleCancel = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+    if (!window.confirm(t('cancelConfirmPrompt'))) return;
     setCancellingId(bookingId);
     try {
       await api.cancelBooking(bookingId, "Cancelled by patient via dashboard");
@@ -55,19 +57,19 @@ export default function UserDashboard({ onNavigate }) {
   const renderStatusBadge = (status) => {
     switch (status) {
       case 'Confirmed':
-        return <span className="badge badge-confirmed">Confirmed</span>;
+        return <span className="badge badge-confirmed">{t('statusConfirmed')}</span>;
       case 'Completed':
-        return <span className="badge badge-completed">Completed</span>;
+        return <span className="badge badge-completed">{t('statusCompleted')}</span>;
       case 'Cancelled':
-        return <span className="badge badge-cancelled">Cancelled</span>;
+        return <span className="badge badge-cancelled">{t('statusCancelled')}</span>;
       default:
-        return <span className="badge badge-pending">Pending</span>;
+        return <span className="badge badge-pending">{t('statusPending')}</span>;
     }
   };
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    return `${d.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • ${d.toLocaleTimeString(language === 'uz' ? 'uz-UZ' : 'en-US', { hour: '2-digit', minute: '2-digit' })}`;
   };
 
   return (
@@ -98,16 +100,16 @@ export default function UserDashboard({ onNavigate }) {
               <Plus size={20} color="#FFFFFF" strokeWidth={3} />
             </div>
             <span style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-              Health<span style={{ color: '#38BDF8' }}>Plus</span>
+              {t('appName')}<span style={{ color: '#38BDF8' }}>{t('appNameAccent')}</span>
             </span>
           </div>
 
           {/* Menu Items */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {[
-              { id: 'dashboard', label: 'Dashboard', icon: Calendar },
-              { id: 'appointments', label: 'My Appointments', icon: FileText },
-              { id: 'browse', label: 'Browse Doctors', icon: User, action: () => onNavigate('doctors') },
+              { id: 'dashboard', label: t('tabDashboard'), icon: Calendar },
+              { id: 'appointments', label: t('tabAppointments'), icon: FileText },
+              { id: 'browse', label: t('navDoctors'), icon: User, action: () => onNavigate('doctors') },
             ].map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -152,7 +154,7 @@ export default function UserDashboard({ onNavigate }) {
           }}
         >
           <LogOut size={18} />
-          <span>Logout</span>
+          <span>{t('navLogout')}</span>
         </button>
       </aside>
 
@@ -184,7 +186,7 @@ export default function UserDashboard({ onNavigate }) {
             boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Upcoming Appointments</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>{t('upcomingAppointments')}</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Calendar size={18} color="var(--primary)" />
               </div>
@@ -203,7 +205,7 @@ export default function UserDashboard({ onNavigate }) {
             boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Completed</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>{t('completedAppointments')}</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={18} color="#10B981" />
               </div>
@@ -222,7 +224,7 @@ export default function UserDashboard({ onNavigate }) {
             boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Cancelled</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>{t('statusCancelled')}</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <XCircle size={18} color="#EF4444" />
               </div>
@@ -241,7 +243,7 @@ export default function UserDashboard({ onNavigate }) {
             boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>Total Bookings</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>{t('totalAppointments')}</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <FileText size={18} color="var(--text-muted)" />
               </div>
@@ -256,9 +258,9 @@ export default function UserDashboard({ onNavigate }) {
         {nextAppointment && (
           <div style={{ marginBottom: '36px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>Upcoming Appointment</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>{t('upcomingAppointments')}</h3>
               <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }} onClick={() => setActiveTab('appointments')}>
-                View All →
+                {t('viewAllServices')} →
               </span>
             </div>
 
@@ -300,14 +302,7 @@ export default function UserDashboard({ onNavigate }) {
                   disabled={cancellingId === nextAppointment.id}
                   className="btn-danger-outline"
                 >
-                  {cancellingId === nextAppointment.id ? 'Cancelling...' : 'Cancel'}
-                </button>
-                <button
-                  onClick={() => alert(`Booking Ref: ${nextAppointment.booking_reference}\nDoctor: ${nextAppointment.doctor?.full_name}\nLocation: ${nextAppointment.doctor?.location}`)}
-                  className="btn-primary"
-                  style={{ padding: '8px 16px', fontSize: '13px' }}
-                >
-                  View Details
+                  {cancellingId === nextAppointment.id ? '...' : t('cancel')}
                 </button>
               </div>
             </div>
@@ -317,22 +312,22 @@ export default function UserDashboard({ onNavigate }) {
         {/* Recent Appointments List */}
         <div>
           <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px' }}>
-            Recent Appointments
+            {t('tabAppointments')}
           </h3>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-              Loading appointments history...
+              {t('loading')}
             </div>
           ) : bookings.length === 0 ? (
             <div style={{ backgroundColor: '#FFFFFF', padding: '40px', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-light)' }}>
-              <p style={{ fontSize: '15px', color: 'var(--text-muted)' }}>You haven't booked any appointments yet.</p>
+              <p style={{ fontSize: '15px', color: 'var(--text-muted)' }}>{t('noBookingsYet')}</p>
               <button
                 onClick={() => onNavigate('doctors')}
                 className="btn-primary"
                 style={{ marginTop: '16px' }}
               >
-                Find a Doctor
+                {t('bookFirstAppointment')}
               </button>
             </div>
           ) : (
@@ -381,7 +376,7 @@ export default function UserDashboard({ onNavigate }) {
                         disabled={cancellingId === booking.id}
                         className="btn-danger-outline"
                       >
-                        {cancellingId === booking.id ? '...' : 'Cancel'}
+                        {cancellingId === booking.id ? '...' : t('cancel')}
                       </button>
                     )}
                   </div>

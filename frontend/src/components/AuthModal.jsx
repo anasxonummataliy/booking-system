@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }) {
   const { login, register, quickLoginAsAlex, quickLoginAsAdmin } = useAuth();
+  const { t } = useLanguage();
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,10 +60,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-main)' }}>
-              {mode === 'login' ? 'Sign In to HealthPlus' : 'Create an Account'}
+              {mode === 'login' ? t('loginHeader') : t('registerHeader')}
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              {mode === 'login' ? 'Access your appointments and records' : 'Join to book appointments in seconds'}
+              {mode === 'login' 
+                ? (t('loginSubtitle') || 'Access your appointments and records') 
+                : (t('registerSubtitle') || 'Join to book appointments in seconds')}
             </p>
           </div>
           <button
@@ -81,7 +85,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           marginBottom: '20px'
         }}>
           <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
-            Quick 1-Click Demo Login
+            {t('quickDemoButtons')}
           </span>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
             <button
@@ -125,7 +129,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             <>
               <div>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '6px' }}>
-                  Full Name
+                  {t('fullNamePlaceholder')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <UserIcon size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
@@ -134,7 +138,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Alex Turner"
+                    placeholder={t('fullNamePlaceholder')}
                     style={{
                       width: '100%',
                       padding: '10px 12px 10px 38px',
@@ -148,7 +152,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
 
               <div>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '6px' }}>
-                  Phone Number
+                  {t('phonePlaceholder')}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Phone size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
@@ -172,7 +176,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
 
           <div>
             <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '6px' }}>
-              Email Address
+              {t('emailPlaceholder')}
             </label>
             <div style={{ position: 'relative' }}>
               <Mail size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
@@ -195,7 +199,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
 
           <div>
             <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: '6px' }}>
-              Password
+              {t('passwordPlaceholder')}
             </label>
             <div style={{ position: 'relative' }}>
               <Lock size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
@@ -222,31 +226,31 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             className="btn-primary"
             style={{ width: '100%', padding: '12px', marginTop: '6px', fontSize: '15px' }}
           >
-            {loading ? 'Please wait...' : (mode === 'login' ? 'Sign In' : 'Create Account')}
+            {loading ? t('loading') : (mode === 'login' ? t('navLogin') : t('navRegister'))}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '18px', fontSize: '13px', color: 'var(--text-muted)' }}>
           {mode === 'login' ? (
             <>
-              Don't have an account?{' '}
+              {t('dontHaveAccount')}{' '}
               <button
                 type="button"
                 onClick={() => { setMode('register'); setError(''); }}
                 style={{ color: 'var(--primary)', fontWeight: 700 }}
               >
-                Sign up
+                {t('navRegister')}
               </button>
             </>
           ) : (
             <>
-              Already have an account?{' '}
+              {t('alreadyHaveAccount')}{' '}
               <button
                 type="button"
                 onClick={() => { setMode('login'); setError(''); }}
                 style={{ color: 'var(--primary)', fontWeight: 700 }}
               >
-                Sign in
+                {t('navLogin')}
               </button>
             </>
           )}

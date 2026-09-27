@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   LayoutDashboard,
   Calendar,
@@ -14,6 +15,7 @@ import {
 
 export default function AdminDashboard({ onNavigate }) {
   const { logout } = useAuth();
+  const { t, language } = useLanguage();
   const [metrics, setMetrics] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,19 +56,19 @@ export default function AdminDashboard({ onNavigate }) {
   const renderBadge = (status) => {
     switch (status) {
       case 'Confirmed':
-        return <span className="badge badge-confirmed">Confirmed</span>;
+        return <span className="badge badge-confirmed">{t('statusConfirmed')}</span>;
       case 'Completed':
-        return <span className="badge badge-completed">Completed</span>;
+        return <span className="badge badge-completed">{t('statusCompleted')}</span>;
       case 'Cancelled':
-        return <span className="badge badge-cancelled">Cancelled</span>;
+        return <span className="badge badge-cancelled">{t('statusCancelled')}</span>;
       default:
-        return <span className="badge badge-pending">Pending</span>;
+        return <span className="badge badge-pending">{t('statusPending')}</span>;
     }
   };
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    return `${d.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short', day: 'numeric' })} • ${d.toLocaleTimeString(language === 'uz' ? 'uz-UZ' : 'en-US', { hour: '2-digit', minute: '2-digit' })}`;
   };
 
   return (
@@ -97,7 +99,7 @@ export default function AdminDashboard({ onNavigate }) {
               <Plus size={20} color="#FFFFFF" strokeWidth={3} />
             </div>
             <span style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-              Health<span style={{ color: '#38BDF8' }}>Plus</span>
+              {t('appName')}<span style={{ color: '#38BDF8' }}>{t('appNameAccent')}</span>
               <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#1E293B', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px', color: '#94A3B8' }}>Admin</span>
             </span>
           </div>
@@ -119,7 +121,7 @@ export default function AdminDashboard({ onNavigate }) {
               }}
             >
               <LayoutDashboard size={18} />
-              <span>Dashboard</span>
+              <span>{t('tabDashboard')}</span>
             </button>
 
             <button
@@ -137,7 +139,7 @@ export default function AdminDashboard({ onNavigate }) {
               }}
             >
               <Calendar size={18} />
-              <span>Patient Portal</span>
+              <span>{t('userDashboardTitle')}</span>
             </button>
 
             {/* Direct Flask-Admin Integration Button */}
@@ -159,7 +161,7 @@ export default function AdminDashboard({ onNavigate }) {
               }}
             >
               <ExternalLink size={18} />
-              <span>Flask-Admin Panel</span>
+              <span>{t('openFlaskAdminBtn')}</span>
             </a>
           </nav>
         </div>
@@ -187,7 +189,7 @@ export default function AdminDashboard({ onNavigate }) {
               fontWeight: 600
             }}
           >
-            <LogOut size={16} /> Logout
+            <LogOut size={16} /> {t('navLogout')}
           </button>
         </div>
       </aside>
@@ -197,10 +199,10 @@ export default function AdminDashboard({ onNavigate }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
           <div>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)' }}>
-              Clinic Dashboard
+              {t('adminDashboardTitle')}
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Real-time bookings, provider utilization, and clinic performance
+              {t('adminDashboardSubtitle')}
             </p>
           </div>
 
@@ -211,7 +213,7 @@ export default function AdminDashboard({ onNavigate }) {
             className="btn-primary"
             style={{ padding: '10px 18px', fontSize: '13px', borderRadius: 'var(--radius-md)' }}
           >
-            <ExternalLink size={16} /> Open Flask-Admin (DB Panel)
+            <ExternalLink size={16} /> {t('openFlaskAdminBtn')}
           </a>
         </div>
 
@@ -224,102 +226,45 @@ export default function AdminDashboard({ onNavigate }) {
         }}>
           {/* Total Bookings */}
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '20px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>Total Bookings</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>{t('totalAppointments')}</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
               {metrics?.total_bookings || 124}
             </div>
             <div style={{ fontSize: '12px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <TrendingUp size={14} /> +12% from last week
+              <TrendingUp size={14} /> +12%
             </div>
           </div>
 
           {/* Confirmed */}
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '20px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>Confirmed</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>{t('statusConfirmed')}</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: '#10B981', marginBottom: '4px' }}>
               {metrics?.confirmed_bookings || 98}
             </div>
             <div style={{ fontSize: '12px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <TrendingUp size={14} /> +8% from last week
+              <TrendingUp size={14} /> +8%
             </div>
           </div>
 
           {/* Pending */}
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '20px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>Pending</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>{t('statusPending')}</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: '#F59E0B', marginBottom: '4px' }}>
               {metrics?.pending_bookings || 18}
             </div>
             <div style={{ fontSize: '12px', color: '#F59E0B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Clock size={14} /> +5% from last week
+              <Clock size={14} /> +5%
             </div>
           </div>
 
           {/* Cancelled */}
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '20px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>Cancelled</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>{t('statusCancelled')}</div>
             <div style={{ fontSize: '28px', fontWeight: 800, color: '#EF4444', marginBottom: '4px' }}>
               {metrics?.cancelled_bookings || 8}
             </div>
             <div style={{ fontSize: '12px', color: '#EF4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <XCircle size={14} /> -2% from last week
-            </div>
-          </div>
-        </div>
-
-        {/* Bookings Overview Chart Section */}
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: 'var(--radius-lg)',
-          padding: '24px',
-          border: '1px solid var(--border-light)',
-          boxShadow: 'var(--shadow-sm)',
-          marginBottom: '32px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-main)' }}>Bookings Overview</h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Appointment volume trend over the last 7 days</p>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', backgroundColor: '#F8FAFC', padding: '6px 12px', borderRadius: 'var(--radius-sm)' }}>
-              Last 7 days
-            </span>
-          </div>
-
-          {/* SVG Sparkline / Trend Curve */}
-          <div style={{ width: '100%', height: '160px', position: 'relative' }}>
-            <svg viewBox="0 0 700 140" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-              <defs>
-                <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-              {/* Curve line & Area */}
-              <path
-                d="M 20 100 Q 120 70, 220 85 T 420 30 T 560 60 T 680 20 L 680 140 L 20 140 Z"
-                fill="url(#chartGradient)"
-              />
-              <path
-                d="M 20 100 Q 120 70, 220 85 T 420 30 T 560 60 T 680 20"
-                fill="none"
-                stroke="#2563EB"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* Dots */}
-              {[[20, 100], [120, 75], [220, 85], [320, 50], [420, 30], [560, 60], [680, 20]].map(([cx, cy], i) => (
-                <circle key={i} cx={cx} cy={cy} r="4" fill="#FFFFFF" stroke="#2563EB" strokeWidth="2" />
-              ))}
-            </svg>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
-              <span>Apr 10</span>
-              <span>Apr 11</span>
-              <span>Apr 12</span>
-              <span>Apr 13</span>
-              <span>Apr 14</span>
-              <span>Apr 15</span>
-              <span>Apr 16</span>
+              <XCircle size={14} /> -2%
             </div>
           </div>
         </div>
@@ -334,44 +279,53 @@ export default function AdminDashboard({ onNavigate }) {
         }}>
           <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)' }}>
             <div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-main)' }}>Recent Bookings</h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>Manage patient status and reservations</p>
+              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-main)' }}>{t('bookingListTitle')}</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{t('adminDashboardSubtitle')}</p>
             </div>
 
             {/* Filter pills */}
             <div style={{ display: 'flex', gap: '8px' }}>
-              {['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'].map(st => (
-                <button
-                  key={st}
-                  onClick={() => setFilterStatus(st)}
-                  className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
-                  style={{ fontSize: '12px', padding: '6px 12px' }}
-                >
-                  {st}
-                </button>
-              ))}
+              {['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'].map(st => {
+                const label = st === 'All' ? t('filterAll') : (
+                  st === 'Confirmed' ? t('statusConfirmed') : (
+                    st === 'Pending' ? t('statusPending') : (
+                      st === 'Completed' ? t('statusCompleted') : t('statusCancelled')
+                    )
+                  )
+                );
+                return (
+                  <button
+                    key={st}
+                    onClick={() => setFilterStatus(st)}
+                    className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
+                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Table */}
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-              Loading bookings...
+              {t('loading')}
             </div>
           ) : bookings.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-              No bookings matching status "{filterStatus}".
+              {t('noBookingsYet')}
             </div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
               <thead>
                 <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Patient</th>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Service</th>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Doctor</th>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Date & Time</th>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Status</th>
-                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>Quick Actions</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('patientName')}</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('navServices')}</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('doctorName')}</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('dateTime')}</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('status')}</th>
+                  <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -402,7 +356,7 @@ export default function AdminDashboard({ onNavigate }) {
                             className="btn-primary"
                             style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px' }}
                           >
-                            Confirm
+                            {t('confirm')}
                           </button>
                         )}
                         {b.status === 'Confirmed' && (
@@ -411,7 +365,7 @@ export default function AdminDashboard({ onNavigate }) {
                             disabled={actionLoadingId === b.id}
                             style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
                           >
-                            Complete
+                            {t('statusCompleted')}
                           </button>
                         )}
                         {b.status !== 'Cancelled' && (
@@ -421,7 +375,7 @@ export default function AdminDashboard({ onNavigate }) {
                             className="btn-danger-outline"
                             style={{ padding: '4px 10px', fontSize: '12px' }}
                           >
-                            Cancel
+                            {t('cancel')}
                           </button>
                         )}
                       </div>

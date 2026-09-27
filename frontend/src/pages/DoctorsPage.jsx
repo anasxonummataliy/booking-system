@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, Search, Star } from 'lucide-react';
 
 const SPECIALTIES = ['All', 'General', 'Cardiology', 'Dermatology', 'Pediatrics', 'Gynecology'];
 
 export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty = 'All' }) {
+  const { t } = useLanguage();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpecialty, setSelectedSpecialty] = useState(initialSpecialty);
@@ -34,6 +36,18 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
     );
   });
 
+  const getSpecialtyLabel = (spec) => {
+    switch (spec) {
+      case 'All': return t('specialtyAll');
+      case 'General': return t('specialtyGeneral');
+      case 'Cardiology': return t('specialtyCardiology');
+      case 'Dermatology': return t('specialtyDermatology');
+      case 'Pediatrics': return t('specialtyPediatrics');
+      case 'Gynecology': return t('specialtyGynecology');
+      default: return spec;
+    }
+  };
+
   return (
     <div style={{ padding: '40px 0 80px', minHeight: '80vh' }}>
       <div className="container" style={{ maxWidth: '820px' }}>
@@ -51,13 +65,13 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
               marginBottom: '16px'
             }}
           >
-            <ArrowLeft size={18} /> Back
+            <ArrowLeft size={18} /> {t('back')}
           </button>
           <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
-            Doctors
+            {t('doctorsHeaderTitle')}
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Find the right specialist for your needs
+            {t('doctorsHeaderSubtitle')}
           </p>
         </div>
 
@@ -66,7 +80,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
           <Search size={18} style={{ position: 'absolute', left: '16px', top: '15px', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search doctor by name or specialty..."
+            placeholder={t('searchDoctorInput')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -95,7 +109,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
               onClick={() => setSelectedSpecialty(spec)}
               className={`pill-filter ${selectedSpecialty === spec ? 'active' : ''}`}
             >
-              {spec}
+              {getSpecialtyLabel(spec)}
             </button>
           ))}
         </div>
@@ -103,12 +117,11 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
         {/* Doctors Cards List */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-            Finding available specialists...
+            {t('loading')}
           </div>
         ) : filteredDoctors.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)' }}>
-            <p style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>No doctors found</p>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>Try adjusting your search or specialty filters</p>
+            <p style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>{t('noDoctorsFound')}</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -153,7 +166,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
                       </span>
                       <span style={{ color: 'var(--border-light)' }}>•</span>
                       <span style={{ color: 'var(--text-muted)' }}>
-                        {doctor.experience_years} years experience
+                        {doctor.experience_years} {t('experience')}
                       </span>
                       <span style={{ color: 'var(--border-light)' }}>•</span>
                       <span style={{ color: 'var(--primary)', fontWeight: 700 }}>
@@ -169,7 +182,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
                   className="btn-primary"
                   style={{ padding: '10px 20px', borderRadius: 'var(--radius-md)' }}
                 >
-                  View Schedule
+                  {t('bookAppointmentBtn')}
                 </button>
               </div>
             ))}

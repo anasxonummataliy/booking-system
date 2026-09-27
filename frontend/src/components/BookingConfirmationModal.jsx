@@ -1,16 +1,18 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Check, Calendar, Clock, MapPin, DollarSign, X } from 'lucide-react';
 
 export default function BookingConfirmationModal({ isOpen, booking, onClose, onViewAppointments, onBookAnother }) {
+  const { t, language } = useLanguage();
   if (!isOpen || !booking) return null;
 
   const doctor = booking.doctor || {};
-  const dateFormatted = new Date(booking.start_time).toLocaleDateString('en-US', {
+  const dateFormatted = new Date(booking.start_time).toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   });
-  const timeFormatted = new Date(booking.start_time).toLocaleTimeString('en-US', {
+  const timeFormatted = new Date(booking.start_time).toLocaleTimeString(language === 'uz' ? 'uz-UZ' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit'
   });
@@ -53,10 +55,10 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
         </div>
 
         <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '6px' }}>
-          Appointment Confirmed!
+          {t('confirmedSuccessTitle')}
         </h2>
         <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
-          Your appointment has been successfully booked.
+          {t('confirmedSuccessSubtitle')}
         </p>
 
         {/* Details Card */}
@@ -76,7 +78,7 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
               style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }}
             />
             <div>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>Doctor</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>{t('doctorName')}</span>
               <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', margin: '2px 0 0' }}>{doctor.full_name}</h4>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{doctor.specialty}</p>
             </div>
@@ -86,7 +88,7 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Calendar size={18} color="var(--primary)" />
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>Date & Time</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>{t('dateTime')}</span>
               <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
                 {dateFormatted} • {timeFormatted}
               </span>
@@ -94,15 +96,15 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Clock size={18} color="var(--primary)" />
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>Duration</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>{t('duration')}</span>
               <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
-                {booking.service?.duration || 30} minutes
+                {booking.service?.duration || 30} {t('mins')}
               </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <MapPin size={18} color="var(--primary)" />
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>Location</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>{t('clinicLocation')}</span>
               <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
                 {doctor.location || 'City Medical Center, Tashkent'}
               </span>
@@ -110,7 +112,7 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <DollarSign size={18} color="var(--primary)" />
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>Price</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)', width: '90px' }}>{t('price')}</span>
               <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--primary)' }}>
                 ${booking.total_price || 30}
               </span>
@@ -125,14 +127,14 @@ export default function BookingConfirmationModal({ isOpen, booking, onClose, onV
             className="btn-primary"
             style={{ width: '100%', padding: '12px', fontSize: '15px' }}
           >
-            View My Appointments
+            {t('viewMyAppointmentsBtn')}
           </button>
           <button
             onClick={onBookAnother}
             className="btn-secondary"
             style={{ width: '100%', padding: '12px', fontSize: '14px' }}
           >
-            Book Another Appointment
+            {t('bookAnotherBtn')}
           </button>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Plus, LogOut, LayoutDashboard, Shield, Calendar } from 'lucide-react';
 
 export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
@@ -39,17 +41,17 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
             <Plus size={22} color="var(--primary)" strokeWidth={3} />
           </div>
           <span style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
-            Health<span style={{ color: 'var(--primary)' }}>Plus</span>
+            {t('appName')}<span style={{ color: 'var(--primary)' }}>{t('appNameAccent')}</span>
           </span>
         </div>
 
         {/* Navigation Links */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           {[
-            { id: 'home', label: 'Home' },
-            { id: 'services', label: 'Services' },
-            { id: 'doctors', label: 'Doctors' },
-            { id: 'dashboard', label: 'My Appointments', authRequired: true },
+            { id: 'home', label: t('navHome') },
+            { id: 'services', label: t('navServices') },
+            { id: 'doctors', label: t('navDoctors') },
+            { id: 'dashboard', label: t('navAppointments'), authRequired: true },
           ].map(link => {
             if (link.authRequired && !isAuthenticated) return null;
             const isActive = activePage === link.id;
@@ -86,13 +88,64 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                 gap: '6px'
               }}
             >
-              <Shield size={15} /> Admin Portal
+              <Shield size={15} /> {t('navAdmin')}
             </button>
           )}
         </nav>
 
-        {/* Right CTA / Profile */}
+        {/* Right CTA / Language Switcher / Profile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Language Switcher Pill */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#F1F5F9',
+            borderRadius: 'var(--radius-full)',
+            padding: '3px',
+            border: '1px solid var(--border-light)'
+          }}>
+            <button
+              onClick={() => setLanguage('uz')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '5px 10px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '12px',
+                fontWeight: language === 'uz' ? 700 : 500,
+                backgroundColor: language === 'uz' ? '#FFFFFF' : 'transparent',
+                color: language === 'uz' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: language === 'uz' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.2s',
+                cursor: 'pointer'
+              }}
+              title="O'zbekcha"
+            >
+              🇺🇿 UZ
+            </button>
+            <button
+              onClick={() => setLanguage('en')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '5px 10px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '12px',
+                fontWeight: language === 'en' ? 700 : 500,
+                backgroundColor: language === 'en' ? '#FFFFFF' : 'transparent',
+                color: language === 'en' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: language === 'en' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.2s',
+                cursor: 'pointer'
+              }}
+              title="English"
+            >
+              🇬🇧 EN
+            </button>
+          </div>
+
           {isAuthenticated ? (
             <div style={{ position: 'relative' }}>
               <button
@@ -160,7 +213,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <Calendar size={16} color="var(--primary)" /> My Bookings
+                    <Calendar size={16} color="var(--primary)" /> {t('navAppointments')}
                   </button>
 
                   {isAdmin && (
@@ -180,7 +233,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      <LayoutDashboard size={16} color="#4338CA" /> Admin Dashboard
+                      <LayoutDashboard size={16} color="#4338CA" /> {t('navAdmin')}
                     </button>
                   )}
 
@@ -202,7 +255,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--danger-bg)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <LogOut size={16} /> Log Out
+                    <LogOut size={16} /> {t('navLogout')}
                   </button>
                 </div>
               )}
@@ -218,14 +271,14 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage }) {
                   color: 'var(--text-main)'
                 }}
               >
-                Login
+                {t('navLogin')}
               </button>
               <button
                 onClick={() => onOpenAuth('register')}
                 className="btn-primary"
                 style={{ padding: '9px 20px', borderRadius: 'var(--radius-md)' }}
               >
-                Sign Up
+                {t('navRegister')}
               </button>
             </div>
           )}
