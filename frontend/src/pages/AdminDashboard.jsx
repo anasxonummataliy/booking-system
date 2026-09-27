@@ -1507,62 +1507,7 @@ export default function AdminDashboard({ onNavigate }) {
           </div>
         )}
 
-        {/* Mobile-only Admin Info & Logout Footer Card */}
-        <div className="mobile-only" style={{
-          marginTop: '36px',
-          padding: '16px',
-          backgroundColor: '#0B132B',
-          borderRadius: 'var(--radius-lg)',
-          color: '#FFFFFF',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: 'var(--shadow-md)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '14px',
-              color: '#FFFFFF'
-            }}>
-              {(user?.full_name || 'Admin')[0].toUpperCase()}
-            </div>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
-                {user?.full_name || 'Admin HealthPlus'}
-              </div>
-              <div style={{ fontSize: '11px', color: '#94A3B8' }}>
-                {user?.email || 'admin@healthplus.uz'}
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => logout()}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 12px',
-              backgroundColor: '#EF4444',
-              color: '#FFFFFF',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '12px',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            <LogOut size={14} />
-            <span>{t('navLogout')}</span>
-          </button>
-        </div>
+
       </main>
       </div>
 
