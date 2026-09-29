@@ -9,7 +9,12 @@ from app.database import SessionLocal
 from app.database.models import User, UserRole
 from app.repositories.user_repository import UserRepository
 
-security = HTTPBearer(auto_error=False)
+security = HTTPBearer(
+    scheme_name="BearerAuth",
+    bearerFormat="JWT",
+    description="JWT Access tokenni kiriting (masalan: login endpointidan olingan token). 'Bearer ' so'zini yozish shart emas.",
+    auto_error=False,
+)
 
 
 def get_db() -> Generator:
@@ -28,7 +33,9 @@ def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication token required"
         )
-    token = credentials.credentials
+    token = credentials.credentials.strip()
+    if token.lower().startswith("bearer "):
+        token = token[7:].strip()
     payload = decode_access_token(token)
     user_id = payload.get("sub")
     if not user_id:

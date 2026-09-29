@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:8000/api/v1');
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api-health-plus.anasxonummataliy.dev/api/v1' : 'http://localhost:8000/api/v1');
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('healthplus_token');
