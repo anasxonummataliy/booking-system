@@ -204,6 +204,7 @@ class BookingService:
         return self.booking_repo.update(booking)
 
     def get_admin_metrics(self) -> dict[str, Any]:
+        self.booking_repo.auto_expire_pending_bookings()
         total = self.booking_repo.db.query(Booking).count()
         confirmed = self.booking_repo.count_by_status(BookingStatus.CONFIRMED.value)
         pending = self.booking_repo.count_by_status(BookingStatus.PENDING.value)

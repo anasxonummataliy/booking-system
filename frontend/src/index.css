@@ -201,6 +201,12 @@ a {
   border: 1px solid var(--info-border);
 }
 
+.badge-expired {
+  background-color: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
 /* Doctor Card Image Styling */
 .doctor-card-img-container {
   height: 240px;

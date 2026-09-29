@@ -25,7 +25,34 @@ class BookingRepository(BaseRepository[Booking]):
     def __init__(self, db: Session):
         super().__init__(Booking, db)
 
+    def auto_expire_pending_bookings(
+        self, user_id: int | None = None, doctor_id: int | None = None
+    ) -> int:
+        """
+        Sana o'tib ketgan va tasdiqlanmagan (Pending) barcha bronlarni 
+        avtomatik tarzda bekor qilingan (Muddati o'tgan) deb belgilaydi.
+        """
+        now = datetime.now()
+        query = self.db.query(Booking).filter(
+            Booking.status == BookingStatus.PENDING.value,
+            Booking.start_time < now,
+        )
+        if user_id is not None:
+            query = query.filter(Booking.user_id == user_id)
+        if doctor_id is not None:
+            query = query.filter(Booking.doctor_id == doctor_id)
+
+        expired_list = query.all()
+        if expired_list:
+            for b in expired_list:
+                b.status = BookingStatus.CANCELLED.value
+                b.cancellation_reason = "Muddati o'tgan (tasdiqlanmadi)"
+            self.db.commit()
+            return len(expired_list)
+        return 0
+
     def get_by_reference(self, reference: str) -> Booking | None:
+        self.auto_expire_pending_bookings()
         return (
             self.db.query(Booking)
             .options(
@@ -36,6 +63,7 @@ class BookingRepository(BaseRepository[Booking]):
         )
 
     def get_user_bookings(self, user_id: int) -> list[Booking]:
+        self.auto_expire_pending_bookings(user_id=user_id)
         return (
             self.db.query(Booking)
             .options(joinedload(Booking.doctor), joinedload(Booking.service))
@@ -51,6 +79,7 @@ class BookingRepository(BaseRepository[Booking]):
         skip: int = 0,
         limit: int = 100,
     ) -> list[Booking]:
+        self.auto_expire_pending_bookings(doctor_id=doctor_id)
         query = self.db.query(Booking).options(
             joinedload(Booking.doctor), joinedload(Booking.service), joinedload(Booking.user)
         )

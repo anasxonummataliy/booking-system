@@ -284,7 +284,18 @@ export default function AdminDashboard({ onNavigate }) {
     }
   };
 
-  const renderBadge = (status) => {
+  const renderBadge = (status, reason) => {
+    const isExpired =
+      status === 'Expired' ||
+      (status === 'Cancelled' &&
+        (reason?.toLowerCase().includes('muddat') || reason?.toLowerCase().includes('expired')));
+    if (isExpired) {
+      return (
+        <span className="badge badge-expired">
+          {language === 'uz' ? "Muddati o'tgan" : 'Expired'}
+        </span>
+      );
+    }
     switch (status) {
       case 'Confirmed':
         return <span className="badge badge-confirmed">{t('statusConfirmed')}</span>;
@@ -1072,7 +1083,7 @@ export default function AdminDashboard({ onNavigate }) {
                           {formatDate(b.start_time)}
                         </td>
                         <td style={{ padding: '14px 20px' }}>
-                          {renderBadge(b.status)}
+                          {renderBadge(b.status, b.cancellation_reason)}
                         </td>
                         <td style={{ padding: '14px 20px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
@@ -1218,7 +1229,7 @@ export default function AdminDashboard({ onNavigate }) {
                           ${b.service?.price || 30}
                         </td>
                         <td style={{ padding: '16px 20px' }}>
-                          {renderBadge(b.status)}
+                          {renderBadge(b.status, b.cancellation_reason)}
                         </td>
                         <td style={{ padding: '16px 20px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>

@@ -20,7 +20,8 @@ export default function UserDashboard({ onNavigate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'appointments'
+  const [activeTab, setActiveTab] = useState('appointments'); // 'appointments'
+  const [statusFilter, setStatusFilter] = useState('ALL');
 
   const fetchBookings = async () => {
     try {
@@ -53,10 +54,21 @@ export default function UserDashboard({ onNavigate }) {
   // Metrics calculation
   const upcomingBookings = bookings.filter(b => b.status === 'Confirmed' || b.status === 'Pending');
   const completedBookings = bookings.filter(b => b.status === 'Completed');
-  const cancelledBookings = bookings.filter(b => b.status === 'Cancelled');
+  const cancelledBookings = bookings.filter(b => b.status === 'Cancelled' || b.status === 'Expired');
   const nextAppointment = upcomingBookings[0] || null;
 
-  const renderStatusBadge = (status) => {
+  const renderStatusBadge = (status, reason) => {
+    const isExpired =
+      status === 'Expired' ||
+      (status === 'Cancelled' &&
+        (reason?.toLowerCase().includes('muddat') || reason?.toLowerCase().includes('expired')));
+    if (isExpired) {
+      return (
+        <span className="badge badge-expired">
+          {language === 'uz' ? "Muddati o'tgan" : 'Expired'}
+        </span>
+      );
+    }
     switch (status) {
       case 'Confirmed':
         return <span className="badge badge-confirmed">{t('statusConfirmed')}</span>;
@@ -70,6 +82,14 @@ export default function UserDashboard({ onNavigate }) {
   };
 
   const formatDate = (dateStr) => formatDateTime(dateStr, language);
+
+  const filteredBookings = bookings.filter(b => {
+    if (statusFilter === 'ALL') return true;
+    if (statusFilter === 'Cancelled') {
+      return b.status === 'Cancelled' || b.status === 'Expired';
+    }
+    return b.status === statusFilter;
+  });
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 76px)', backgroundColor: 'var(--bg-page)' }}>
@@ -103,11 +123,10 @@ export default function UserDashboard({ onNavigate }) {
             </span>
           </div>
 
-          {/* Menu Items */}
+          {/* Menu Items - Only "Barcha qabullar" & "Shifokorlar" */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {[
-              { id: 'dashboard', label: t('tabDashboard'), icon: Calendar },
-              { id: 'appointments', label: t('tabAppointments'), icon: FileText },
+              { id: 'appointments', label: t('tabAppointments'), icon: Calendar },
               { id: 'browse', label: t('navDoctors'), icon: User, action: () => onNavigate('doctors') },
             ].map(item => {
               const Icon = item.icon;
@@ -253,8 +272,14 @@ export default function UserDashboard({ onNavigate }) {
           <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>{t('upcomingAppointments')}</h3>
-              <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }} onClick={() => setActiveTab('appointments')}>
-                {t('viewAllServices')} →
+              <span
+                style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer' }}
+                onClick={() => {
+                  const el = document.getElementById('appointments-list-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                {language === 'uz' ? "Barcha qabullarni ko'rish →" : "View all appointments →"}
               </span>
             </div>
 
@@ -276,7 +301,7 @@ export default function UserDashboard({ onNavigate }) {
                     <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
                       {formatDate(nextAppointment.start_time)}
                     </span>
-                    {renderStatusBadge(nextAppointment.status)}
+                    {renderStatusBadge(nextAppointment.status, nextAppointment.cancellation_reason)}
                   </div>
                 </div>
               </div>
@@ -295,11 +320,62 @@ export default function UserDashboard({ onNavigate }) {
           </div>
         )}
 
-        {/* Recent Appointments List */}
-        <div>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '16px' }}>
-            {t('tabAppointments')}
-          </h3>
+        {/* All Appointments Section */}
+        <div id="appointments-list-section">
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '16px'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+              {t('tabAppointments')}
+            </h3>
+
+            {/* Status Filter Pills */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {[
+                { id: 'ALL', label: t('filterAll') || 'Barchasi', count: bookings.length },
+                { id: 'Pending', label: t('statusPending') || 'Kutilmoqda', count: bookings.filter(b => b.status === 'Pending').length },
+                { id: 'Confirmed', label: t('statusConfirmed') || 'Tasdiqlangan', count: bookings.filter(b => b.status === 'Confirmed').length },
+                { id: 'Completed', label: t('statusCompleted') || 'Yakunlangan', count: completedBookings.length },
+                { id: 'Cancelled', label: language === 'uz' ? "Bekor / Muddati o'tgan" : 'Cancelled / Expired', count: cancelledBookings.length },
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setStatusFilter(f.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    border: '1px solid',
+                    borderColor: statusFilter === f.id ? 'var(--primary)' : 'var(--border-light)',
+                    backgroundColor: statusFilter === f.id ? 'var(--primary)' : '#FFFFFF',
+                    color: statusFilter === f.id ? '#FFFFFF' : 'var(--text-muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <span>{f.label}</span>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    backgroundColor: statusFilter === f.id ? 'rgba(255,255,255,0.25)' : '#F1F5F9',
+                    color: statusFilter === f.id ? '#FFFFFF' : 'var(--text-muted)'
+                  }}>
+                    {f.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
@@ -316,6 +392,19 @@ export default function UserDashboard({ onNavigate }) {
                 {t('bookFirstAppointment')}
               </button>
             </div>
+          ) : filteredBookings.length === 0 ? (
+            <div style={{ backgroundColor: '#FFFFFF', padding: '32px', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-light)' }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                {language === 'uz' ? "Tanlangan holat bo'yicha qabullar topilmadi" : 'No appointments found for the selected filter'}
+              </p>
+              <button
+                onClick={() => setStatusFilter('ALL')}
+                className="btn-outline"
+                style={{ marginTop: '12px', fontSize: '13px' }}
+              >
+                {language === 'uz' ? "Barcha qabullarni ko'rsatish" : 'Show all bookings'}
+              </button>
+            </div>
           ) : (
             <div style={{
               backgroundColor: '#FFFFFF',
@@ -323,7 +412,7 @@ export default function UserDashboard({ onNavigate }) {
               border: '1px solid var(--border-light)',
               overflow: 'hidden'
             }}>
-              {bookings.map((booking) => (
+              {filteredBookings.map((booking) => (
                 <div
                   key={booking.id}
                   className="appointment-item-card"
@@ -344,6 +433,16 @@ export default function UserDashboard({ onNavigate }) {
                       <div className="mobile-only" style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
                         {formatDate(booking.start_time)}
                       </div>
+                      {booking.cancellation_reason && (
+                        <div style={{
+                          fontSize: '12px',
+                          color: (booking.cancellation_reason.toLowerCase().includes('muddat') || booking.cancellation_reason.toLowerCase().includes('expired')) ? '#B45309' : '#EF4444',
+                          marginTop: '3px',
+                          fontWeight: 500
+                        }}>
+                          ℹ️ {booking.cancellation_reason}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -352,7 +451,7 @@ export default function UserDashboard({ onNavigate }) {
                       {formatDate(booking.start_time)}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {renderStatusBadge(booking.status)}
+                      {renderStatusBadge(booking.status, booking.cancellation_reason)}
                       {(booking.status === 'Confirmed' || booking.status === 'Pending') && (
                         <button
                           onClick={() => handleCancel(booking.id)}
