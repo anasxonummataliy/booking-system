@@ -16,7 +16,7 @@ class AuthService:
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A user with this email address already exists.",
+                detail="Ushbu email bilan foydalanuvchi mavjud / A user with this email address already exists.",
             )
 
         hashed = hash_password(data.password)
@@ -36,12 +36,13 @@ class AuthService:
         user = self.user_repo.get_by_email(data.email)
         if not user or not verify_password(data.password, user.hashed_password):
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password."
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email manzili yoki parol noto'g'ri / Incorrect email or password.",
             )
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Your user account has been deactivated.",
+                detail="Ushbu hisob faolsizlantirilgan / Your user account has been deactivated.",
             )
 
         access_token = create_access_token(subject=str(user.id))

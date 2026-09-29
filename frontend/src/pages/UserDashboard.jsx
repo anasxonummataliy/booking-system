@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatDateTime } from '../utils/dateFormatter';
+import { formatErrorMessage } from '../utils/errorHandler';
 import {
   Calendar,
   CheckCircle,
@@ -43,7 +44,7 @@ export default function UserDashboard({ onNavigate }) {
       await api.cancelBooking(bookingId, "Cancelled by patient via dashboard");
       await fetchBookings();
     } catch (err) {
-      alert(err.message || "Failed to cancel booking");
+      alert(formatErrorMessage(err, language));
     } finally {
       setCancellingId(null);
     }

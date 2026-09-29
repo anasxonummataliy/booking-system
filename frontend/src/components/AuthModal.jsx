@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-react';
+import { formatErrorMessage } from '../utils/errorHandler';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }) {
   const { login, register, quickLoginAsAnasxon, quickLoginAsAdmin } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +30,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
       onClose();
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please verify credentials.');
+      setError(formatErrorMessage(err, language));
     } finally {
       setLoading(false);
     }
@@ -47,7 +48,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
       onClose();
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err.message || 'Demo login failed');
+      setError(formatErrorMessage(err, language));
     } finally {
       setLoading(false);
     }

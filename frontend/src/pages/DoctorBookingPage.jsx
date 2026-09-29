@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatMonthYear, formatDayMonth, formatSlotTime } from '../utils/dateFormatter';
+import { formatErrorMessage } from '../utils/errorHandler';
 import {
   ArrowLeft,
   Star,
@@ -120,7 +121,7 @@ export default function DoctorBookingPage({
       const createdBooking = await api.createBooking(payload);
       onBookingSuccess(createdBooking);
     } catch (err) {
-      setBookingError(err.message || "Failed to complete appointment reservation.");
+      setBookingError(formatErrorMessage(err, language));
     } finally {
       setBookingLoading(false);
     }

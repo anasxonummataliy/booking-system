@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatDateTime } from '../utils/dateFormatter';
+import { formatErrorMessage } from '../utils/errorHandler';
 import {
   LayoutDashboard,
   Calendar,
@@ -135,7 +136,7 @@ export default function AdminDashboard({ onNavigate }) {
       const b = await api.getAllBookings(filterStatus);
       setBookings(b || []);
     } catch (err) {
-      alert(err.message || "Failed to update booking status");
+      alert(formatErrorMessage(err, language));
     } finally {
       setActionLoadingId(null);
     }
@@ -179,7 +180,7 @@ export default function AdminDashboard({ onNavigate }) {
       const s = await api.getServices();
       setServices(s || []);
     } catch (err) {
-      alert(err.message || "Failed to save service");
+      alert(formatErrorMessage(err, language));
     }
   };
 
@@ -206,7 +207,7 @@ export default function AdminDashboard({ onNavigate }) {
       }
       setDeleteConfirmModal({ open: false, type: null, id: null, name: '', loading: false });
     } catch (err) {
-      alert(err.message || (language === 'uz' ? "O'chirishda xatolik yuz berdi" : "Failed to delete"));
+      alert(formatErrorMessage(err, language));
       setDeleteConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
@@ -259,7 +260,7 @@ export default function AdminDashboard({ onNavigate }) {
       const d = await api.getDoctors();
       setDoctors(d || []);
     } catch (err) {
-      alert(err.message || "Failed to save doctor");
+      alert(formatErrorMessage(err, language));
     }
   };
 
@@ -279,7 +280,7 @@ export default function AdminDashboard({ onNavigate }) {
       setScheduleModalOpen(false);
       await loadDoctorSchedules(selectedScheduleDoctorId);
     } catch (err) {
-      alert(err.message || "Failed to save schedule");
+      alert(formatErrorMessage(err, language));
     }
   };
 

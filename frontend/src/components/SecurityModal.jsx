@@ -10,9 +10,10 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { formatErrorMessage } from '../utils/errorHandler';
 
 export default function SecurityModal({ isOpen, onClose }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Change password state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -55,7 +56,7 @@ export default function SecurityModal({ isOpen, onClose }) {
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setPasswordError(err.message || 'Parolni o‘zgartirishda xatolik yuz berdi');
+      setPasswordError(formatErrorMessage(err, language));
     } finally {
       setPasswordLoading(false);
     }
