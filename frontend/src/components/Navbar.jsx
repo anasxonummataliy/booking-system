@@ -64,6 +64,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
             return (
               <button
                 key={link.id}
+                id={`nav-link-${link.id}`}
                 onClick={() => setActivePage(link.id)}
                 style={{
                   fontSize: '15px',
@@ -81,6 +82,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
 
           {isAdmin && (
             <button
+              id="nav-link-admin"
               onClick={() => setActivePage('admin')}
               style={{
                 fontSize: '14px',
@@ -111,6 +113,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
             border: '1px solid var(--border-light)'
           }}>
             <button
+              id="nav-lang-uz"
               onClick={() => setLanguage('uz')}
               style={{
                 display: 'flex',
@@ -130,6 +133,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
               🇺🇿 UZ
             </button>
             <button
+              id="nav-lang-en"
               onClick={() => setLanguage('en')}
               style={{
                 display: 'flex',
@@ -153,6 +157,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
           {isAuthenticated ? (
             <div style={{ position: 'relative' }}>
               <button
+                id="nav-profile-menu-btn"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 style={{
                   display: 'flex',
@@ -202,6 +207,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
                   zIndex: 200
                 }}>
                   <button
+                    id="nav-dropdown-profile"
                     onClick={() => { setActivePage('profile'); setDropdownOpen(false); }}
                     style={{
                       width: '100%',
@@ -220,6 +226,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
 
                   {!isAdmin && (
                     <button
+                      id="nav-dropdown-appointments"
                       onClick={() => { setActivePage('dashboard'); setDropdownOpen(false); }}
                       style={{
                         width: '100%',
@@ -239,6 +246,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
 
                   {isAdmin && (
                     <button
+                      id="nav-dropdown-admin"
                       onClick={() => { setActivePage('admin'); setDropdownOpen(false); }}
                       style={{
                         width: '100%',
@@ -259,6 +267,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
                   <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)', margin: '6px 0' }} />
 
                   <button
+                    id="nav-dropdown-logout"
                     onClick={() => { logout(); setDropdownOpen(false); }}
                     style={{
                       width: '100%',
@@ -280,6 +289,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
           ) : (
             <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button
+                id="nav-login-btn"
                 onClick={() => onOpenAuth('login')}
                 style={{
                   padding: '8px 14px',
@@ -291,6 +301,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
                 {t('navLogin')}
               </button>
               <button
+                id="nav-register-btn"
                 onClick={() => onOpenAuth('register')}
                 className="btn-primary"
                 style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '13px' }}
@@ -302,6 +313,7 @@ export default function Navbar({ onOpenAuth, activePage, setActivePage, onOpenDr
 
           {/* Mobile Hamburger Menu Toggle Button */}
           <button
+            id="nav-mobile-toggle-btn"
             onClick={onOpenDrawer}
             className="mobile-nav-toggle"
             style={{

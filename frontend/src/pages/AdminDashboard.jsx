@@ -41,6 +41,13 @@ export default function AdminDashboard({ onNavigate }) {
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
   // Modals state
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({
+    open: false,
+    type: null,
+    id: null,
+    name: '',
+    loading: false
+  });
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [serviceForm, setServiceForm] = useState({
@@ -176,13 +183,31 @@ export default function AdminDashboard({ onNavigate }) {
     }
   };
 
-  const handleDeleteService = async (id) => {
-    if (!window.confirm(t('deleteConfirm'))) return;
+  const handleOpenDeleteModal = (type, id, name) => {
+    setDeleteConfirmModal({
+      open: true,
+      type,
+      id,
+      name,
+      loading: false
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmModal.id) return;
+    setDeleteConfirmModal(prev => ({ ...prev, loading: true }));
     try {
-      await api.deleteService(id);
-      setServices(prev => prev.filter(s => s.id !== id));
+      if (deleteConfirmModal.type === 'service') {
+        await api.deleteService(deleteConfirmModal.id);
+        setServices(prev => prev.filter(s => s.id !== deleteConfirmModal.id));
+      } else if (deleteConfirmModal.type === 'doctor') {
+        await api.deleteDoctor(deleteConfirmModal.id);
+        setDoctors(prev => prev.filter(d => d.id !== deleteConfirmModal.id));
+      }
+      setDeleteConfirmModal({ open: false, type: null, id: null, name: '', loading: false });
     } catch (err) {
-      alert(err.message || "Failed to delete service");
+      alert(err.message || (language === 'uz' ? "O'chirishda xatolik yuz berdi" : "Failed to delete"));
+      setDeleteConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -238,15 +263,7 @@ export default function AdminDashboard({ onNavigate }) {
     }
   };
 
-  const handleDeleteDoctor = async (id) => {
-    if (!window.confirm(t('deleteConfirm'))) return;
-    try {
-      await api.deleteDoctor(id);
-      setDoctors(prev => prev.filter(d => d.id !== id));
-    } catch (err) {
-      alert(err.message || "Failed to delete doctor");
-    }
-  };
+
 
   // Schedule Save
   const handleSaveSchedule = async (e) => {
@@ -357,6 +374,7 @@ export default function AdminDashboard({ onNavigate }) {
             padding: '2px'
           }}>
             <button
+              id="admin-lang-uz"
               onClick={() => setLanguage('uz')}
               style={{
                 padding: '4px 8px',
@@ -372,6 +390,7 @@ export default function AdminDashboard({ onNavigate }) {
               🇺🇿 UZ
             </button>
             <button
+              id="admin-lang-en"
               onClick={() => setLanguage('en')}
               style={{
                 padding: '4px 8px',
@@ -400,6 +419,7 @@ export default function AdminDashboard({ onNavigate }) {
 
           {/* Logout (Desktop) */}
           <button
+            id="admin-logout-btn"
             onClick={() => logout()}
             className="desktop-only"
             style={{
@@ -423,6 +443,7 @@ export default function AdminDashboard({ onNavigate }) {
 
           {/* Mobile Animated Hamburger Button */}
           <button
+            id="admin-mobile-menu-btn"
             onClick={() => setAdminDrawerOpen(true)}
             className="mobile-only"
             style={{
@@ -488,6 +509,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               <button
+                id="admin-drawer-close"
                 onClick={() => setAdminDrawerOpen(false)}
                 style={{
                   color: '#94A3B8',
@@ -554,6 +576,7 @@ export default function AdminDashboard({ onNavigate }) {
                 return (
                   <button
                     key={tab.id}
+                    id={`drawer-tab-${tab.id}`}
                     onClick={() => {
                       setActiveTab(tab.id);
                       setAdminDrawerOpen(false);
@@ -599,6 +622,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <button
+                  id="drawer-lang-uz"
                   onClick={() => setLanguage('uz')}
                   style={{
                     padding: '8px',
@@ -614,6 +638,7 @@ export default function AdminDashboard({ onNavigate }) {
                   🇺🇿 O'zbekcha
                 </button>
                 <button
+                  id="drawer-lang-en"
                   onClick={() => setLanguage('en')}
                   style={{
                     padding: '8px',
@@ -634,6 +659,7 @@ export default function AdminDashboard({ onNavigate }) {
             {/* Logout at bottom */}
             <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
               <button
+                id="drawer-logout-btn"
                 onClick={() => {
                   logout();
                   setAdminDrawerOpen(false);
@@ -675,6 +701,7 @@ export default function AdminDashboard({ onNavigate }) {
           return (
             <button
               key={tab.id}
+              id={`mobile-tab-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={`admin-mobile-tab-btn ${isActive ? 'active' : ''}`}
             >
@@ -711,6 +738,7 @@ export default function AdminDashboard({ onNavigate }) {
           {/* Navigation Tabs */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <button
+              id="admin-tab-overview"
               onClick={() => setActiveTab('overview')}
               style={{
                 display: 'flex',
@@ -731,6 +759,7 @@ export default function AdminDashboard({ onNavigate }) {
             </button>
 
             <button
+              id="admin-tab-bookings"
               onClick={() => setActiveTab('bookings')}
               style={{
                 display: 'flex',
@@ -764,6 +793,7 @@ export default function AdminDashboard({ onNavigate }) {
             </button>
 
             <button
+              id="admin-tab-services"
               onClick={() => setActiveTab('services')}
               style={{
                 display: 'flex',
@@ -785,6 +815,7 @@ export default function AdminDashboard({ onNavigate }) {
             </button>
 
             <button
+              id="admin-tab-doctors"
               onClick={() => setActiveTab('doctors')}
               style={{
                 display: 'flex',
@@ -806,6 +837,7 @@ export default function AdminDashboard({ onNavigate }) {
             </button>
 
             <button
+              id="admin-tab-schedules"
               onClick={() => setActiveTab('schedules')}
               style={{
                 display: 'flex',
@@ -899,6 +931,7 @@ export default function AdminDashboard({ onNavigate }) {
           <div style={{ display: 'flex', gap: '12px' }}>
             {activeTab === 'services' && (
               <button
+                id="add-service-btn"
                 onClick={() => handleOpenServiceModal()}
                 className="btn-primary"
                 style={{ padding: '10px 18px', fontSize: '13px', borderRadius: 'var(--radius-md)' }}
@@ -908,6 +941,7 @@ export default function AdminDashboard({ onNavigate }) {
             )}
             {activeTab === 'doctors' && (
               <button
+                id="add-doctor-btn"
                 onClick={() => handleOpenDoctorModal()}
                 className="btn-primary"
                 style={{ padding: '10px 18px', fontSize: '13px', borderRadius: 'var(--radius-md)' }}
@@ -917,6 +951,7 @@ export default function AdminDashboard({ onNavigate }) {
             )}
             {activeTab === 'schedules' && (
               <button
+                id="add-schedule-btn"
                 onClick={() => setScheduleModalOpen(true)}
                 className="btn-primary"
                 style={{ padding: '10px 18px', fontSize: '13px', borderRadius: 'var(--radius-md)' }}
@@ -1001,6 +1036,7 @@ export default function AdminDashboard({ onNavigate }) {
                   <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{language === 'uz' ? 'So‘nggi bron qilingan qabullar' : 'Recent patient appointments'}</p>
                 </div>
                 <button
+                  id="overview-view-all-btn"
                   onClick={() => setActiveTab('bookings')}
                   className="btn-secondary"
                   style={{ fontSize: '12px', padding: '6px 14px' }}
@@ -1041,6 +1077,7 @@ export default function AdminDashboard({ onNavigate }) {
                           <div style={{ display: 'flex', gap: '8px' }}>
                             {b.status === 'Pending' && (
                               <button
+                                id={`overview-confirm-${b.id}`}
                                 onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
                                 disabled={actionLoadingId === b.id}
                                 className="btn-primary"
@@ -1051,6 +1088,7 @@ export default function AdminDashboard({ onNavigate }) {
                             )}
                             {b.status === 'Confirmed' && (
                               <button
+                                id={`overview-complete-${b.id}`}
                                 onClick={() => handleUpdateStatus(b.id, 'Completed')}
                                 disabled={actionLoadingId === b.id}
                                 style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
@@ -1080,6 +1118,7 @@ export default function AdminDashboard({ onNavigate }) {
               <div style={{ position: 'relative', width: '280px', maxWidth: '100%', flex: '1 1 220px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
                 <input
+                  id="bookings-search-input"
                   type="text"
                   placeholder={language === 'uz' ? 'Qidirish (bemor, shifokor)...' : 'Search patient, doctor...'}
                   value={searchQuery}
@@ -1121,6 +1160,7 @@ export default function AdminDashboard({ onNavigate }) {
                   return (
                     <button
                       key={st}
+                      id={`filter-${st.toLowerCase()}`}
                       onClick={() => setFilterStatus(st)}
                       className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
                       style={{
@@ -1183,6 +1223,7 @@ export default function AdminDashboard({ onNavigate }) {
                           <div style={{ display: 'flex', gap: '8px' }}>
                             {b.status === 'Pending' && (
                               <button
+                                id={`confirm-booking-${b.id}`}
                                 onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
                                 disabled={actionLoadingId === b.id}
                                 className="btn-primary"
@@ -1193,6 +1234,7 @@ export default function AdminDashboard({ onNavigate }) {
                             )}
                             {b.status === 'Confirmed' && (
                               <button
+                                id={`complete-booking-${b.id}`}
                                 onClick={() => handleUpdateStatus(b.id, 'Completed')}
                                 disabled={actionLoadingId === b.id}
                                 style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
@@ -1202,6 +1244,7 @@ export default function AdminDashboard({ onNavigate }) {
                             )}
                             {(b.status === 'Pending' || b.status === 'Confirmed') && (
                               <button
+                                id={`cancel-booking-${b.id}`}
                                 onClick={() => handleUpdateStatus(b.id, 'Cancelled')}
                                 disabled={actionLoadingId === b.id}
                                 className="btn-danger-outline"
@@ -1287,6 +1330,7 @@ export default function AdminDashboard({ onNavigate }) {
 
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button
+                      id={`edit-service-${svc.id}`}
                       onClick={() => handleOpenServiceModal(svc)}
                       className="btn-secondary"
                       style={{ flex: 1, fontSize: '12px', padding: '8px', justifyContent: 'center' }}
@@ -1294,7 +1338,8 @@ export default function AdminDashboard({ onNavigate }) {
                       <Edit2 size={14} /> {t('edit')}
                     </button>
                     <button
-                      onClick={() => handleDeleteService(svc.id)}
+                      id={`delete-service-${svc.id}`}
+                      onClick={() => handleOpenDeleteModal('service', svc.id, svc.name)}
                       className="btn-danger-outline"
                       style={{ padding: '8px 12px' }}
                     >
@@ -1366,6 +1411,7 @@ export default function AdminDashboard({ onNavigate }) {
 
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
+                    id={`doctor-schedule-${doc.id}`}
                     onClick={() => {
                       setSelectedScheduleDoctorId(doc.id);
                       setActiveTab('schedules');
@@ -1376,6 +1422,7 @@ export default function AdminDashboard({ onNavigate }) {
                     <Clock size={14} /> {t('adminTabSchedules')}
                   </button>
                   <button
+                    id={`edit-doctor-${doc.id}`}
                     onClick={() => handleOpenDoctorModal(doc)}
                     className="btn-secondary"
                     style={{ padding: '8px 12px' }}
@@ -1383,7 +1430,8 @@ export default function AdminDashboard({ onNavigate }) {
                     <Edit2 size={14} />
                   </button>
                   <button
-                    onClick={() => handleDeleteDoctor(doc.id)}
+                    id={`delete-doctor-${doc.id}`}
+                    onClick={() => handleOpenDeleteModal('doctor', doc.id, doc.full_name)}
                     className="btn-danger-outline"
                     style={{ padding: '8px 12px' }}
                   >
@@ -1415,6 +1463,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {language === 'uz' ? 'Shifokorni tanlang:' : 'Select Doctor:'}
                 </span>
                 <select
+                  id="schedule-doctor-select"
                   value={selectedScheduleDoctorId || ''}
                   onChange={(e) => setSelectedScheduleDoctorId(Number(e.target.value))}
                   style={{
@@ -1436,6 +1485,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               <button
+                id="schedule-set-btn"
                 onClick={() => setScheduleModalOpen(true)}
                 className="btn-primary"
                 style={{ fontSize: '13px', padding: '8px 16px' }}
@@ -1497,6 +1547,7 @@ export default function AdminDashboard({ onNavigate }) {
                     )}
 
                     <button
+                      id={`edit-schedule-day-${idx}`}
                       onClick={() => {
                         setScheduleForm({
                           day_of_week: idx,
@@ -1542,7 +1593,7 @@ export default function AdminDashboard({ onNavigate }) {
               <h2 style={{ fontSize: '19px', fontWeight: 800, color: 'var(--text-main)' }}>
                 {editingService ? t('edit') : t('addNewService')}
               </h2>
-              <button onClick={() => setServiceModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
+              <button id="service-modal-close" onClick={() => setServiceModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
                 <X size={20} />
               </button>
             </div>
@@ -1553,6 +1604,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('serviceName')}
                 </label>
                 <input
+                  id="service-name-input"
                   type="text"
                   required
                   value={serviceForm.name}
@@ -1566,6 +1618,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('serviceDesc')}
                 </label>
                 <textarea
+                  id="service-desc-input"
                   rows={3}
                   required
                   value={serviceForm.description}
@@ -1580,6 +1633,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('serviceDuration')}
                   </label>
                   <input
+                    id="service-duration-input"
                     type="number"
                     min={10}
                     step={5}
@@ -1595,6 +1649,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('servicePrice')}
                   </label>
                   <input
+                    id="service-price-input"
                     type="number"
                     min={0}
                     step={1}
@@ -1607,6 +1662,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               <button
+                id="service-submit-btn"
                 type="submit"
                 className="btn-primary"
                 style={{ width: '100%', padding: '12px', marginTop: '10px', fontSize: '14px' }}
@@ -1626,7 +1682,7 @@ export default function AdminDashboard({ onNavigate }) {
               <h2 style={{ fontSize: '19px', fontWeight: 800, color: 'var(--text-main)' }}>
                 {editingDoctor ? t('edit') : t('addNewDoctor')}
               </h2>
-              <button onClick={() => setDoctorModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
+              <button id="doctor-modal-close" onClick={() => setDoctorModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
                 <X size={20} />
               </button>
             </div>
@@ -1637,6 +1693,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('doctorFullName')}
                 </label>
                 <input
+                  id="doctor-fullname-input"
                   type="text"
                   required
                   placeholder="Dr. Alisher Usmonov"
@@ -1652,6 +1709,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('doctorSpecialty')}
                   </label>
                   <input
+                    id="doctor-specialty-input"
                     type="text"
                     required
                     placeholder="Cardiology"
@@ -1666,6 +1724,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('doctorFee')}
                   </label>
                   <input
+                    id="doctor-fee-input"
                     type="number"
                     min={0}
                     required
@@ -1681,6 +1740,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('doctorBio')}
                 </label>
                 <textarea
+                  id="doctor-bio-input"
                   rows={2}
                   required
                   value={doctorForm.bio}
@@ -1695,6 +1755,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('doctorExp')}
                   </label>
                   <input
+                    id="doctor-exp-input"
                     type="number"
                     min={0}
                     value={doctorForm.experience_years}
@@ -1708,6 +1769,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('doctorLanguages')}
                   </label>
                   <input
+                    id="doctor-languages-input"
                     type="text"
                     value={doctorForm.languages}
                     onChange={e => setDoctorForm({ ...doctorForm, languages: e.target.value })}
@@ -1717,6 +1779,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               <button
+                id="doctor-submit-btn"
                 type="submit"
                 className="btn-primary"
                 style={{ width: '100%', padding: '12px', marginTop: '10px', fontSize: '14px' }}
@@ -1736,7 +1799,7 @@ export default function AdminDashboard({ onNavigate }) {
               <h2 style={{ fontSize: '19px', fontWeight: 800, color: 'var(--text-main)' }}>
                 {t('setSchedule')}
               </h2>
-              <button onClick={() => setScheduleModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
+              <button id="schedule-modal-close" onClick={() => setScheduleModalOpen(false)} style={{ color: 'var(--text-muted)' }}>
                 <X size={20} />
               </button>
             </div>
@@ -1747,6 +1810,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('scheduleDay')}
                 </label>
                 <select
+                  id="schedule-day-select"
                   value={scheduleForm.day_of_week}
                   onChange={e => setScheduleForm({ ...scheduleForm, day_of_week: Number(e.target.value) })}
                   style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)', fontSize: '14px' }}
@@ -1763,6 +1827,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('scheduleStartTime')}
                   </label>
                   <input
+                    id="schedule-start-time"
                     type="time"
                     required
                     value={scheduleForm.start_time}
@@ -1776,6 +1841,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('scheduleEndTime')}
                   </label>
                   <input
+                    id="schedule-end-time"
                     type="time"
                     required
                     value={scheduleForm.end_time}
@@ -1791,6 +1857,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('scheduleBreakStart')}
                   </label>
                   <input
+                    id="schedule-break-start"
                     type="time"
                     value={scheduleForm.break_start || ''}
                     onChange={e => setScheduleForm({ ...scheduleForm, break_start: e.target.value })}
@@ -1803,6 +1870,7 @@ export default function AdminDashboard({ onNavigate }) {
                     {t('scheduleBreakEnd')}
                   </label>
                   <input
+                    id="schedule-break-end"
                     type="time"
                     value={scheduleForm.break_end || ''}
                     onChange={e => setScheduleForm({ ...scheduleForm, break_end: e.target.value })}
@@ -1816,6 +1884,7 @@ export default function AdminDashboard({ onNavigate }) {
                   {t('slotDurationMinutes')}
                 </label>
                 <input
+                  id="schedule-slot-duration"
                   type="number"
                   min={10}
                   step={5}
@@ -1826,6 +1895,7 @@ export default function AdminDashboard({ onNavigate }) {
               </div>
 
               <button
+                id="schedule-submit-btn"
                 type="submit"
                 className="btn-primary"
                 style={{ width: '100%', padding: '12px', marginTop: '10px', fontSize: '14px' }}
@@ -1833,6 +1903,73 @@ export default function AdminDashboard({ onNavigate }) {
                 {t('saveChanges')}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: DELETE CONFIRMATION MODAL */}
+      {deleteConfirmModal.open && (
+        <div className="modal-overlay" onClick={() => !deleteConfirmModal.loading && setDeleteConfirmModal({ open: false, type: null, id: null, name: '', loading: false })}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center', padding: '28px 24px' }}>
+            <div style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              backgroundColor: '#FEF2F2',
+              color: '#EF4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              border: '1px solid #FEE2E2'
+            }}>
+              <Trash2 size={24} />
+            </div>
+
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
+              {deleteConfirmModal.type === 'service' ? (language === 'uz' ? 'Xizmatni o‘chirish' : 'Delete Service') : (language === 'uz' ? 'Shifokorni o‘chirish' : 'Delete Doctor')}
+            </h3>
+
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '24px' }}>
+              {language === 'uz'
+                ? `Haqiqatan ham "${deleteConfirmModal.name}" ni o‘chirmoqchimisiz?`
+                : `Are you sure you want to delete "${deleteConfirmModal.name}"?`}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <button
+                id="delete-cancel-btn"
+                type="button"
+                disabled={deleteConfirmModal.loading}
+                onClick={() => setDeleteConfirmModal({ open: false, type: null, id: null, name: '', loading: false })}
+                className="btn-secondary"
+                style={{ padding: '10px', fontSize: '14px', justifyContent: 'center' }}
+              >
+                {t('cancel')}
+              </button>
+              <button
+                id="delete-confirm-btn"
+                type="button"
+                disabled={deleteConfirmModal.loading}
+                onClick={handleConfirmDelete}
+                style={{
+                  padding: '10px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  backgroundColor: '#EF4444',
+                  color: '#FFFFFF',
+                  borderRadius: 'var(--radius-md)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                {deleteConfirmModal.loading ? t('loading') : (language === 'uz' ? 'O‘chirish' : 'Delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}

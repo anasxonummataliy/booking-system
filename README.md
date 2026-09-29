@@ -1,86 +1,95 @@
-# 🏥 HealthPlus - Modern Doctor Appointment Booking System
+# 🏥 HealthPlus - Zamonaviy Shifokor Qabuliga Yozilish Tizimi
 
-> **A production-ready Doctor Appointment Booking System for healthcare & service businesses** built with **FastAPI (Clean Architecture & Repository Pattern)**, **SQLite (Primary Database)**, **Custom In-App Admin Dashboard**, and **React (Vite)** with custom UI aesthetics matching the HealthPlus telemedicine specification.
-
----
-
-## 📸 Overview & UI Preview
-HealthPlus offers a complete patient and administrative booking experience:
-1. **Interactive Landing & Doctor Search:** Filter by service, doctor specialty, and preferred date.
-2. **Service Catalog:** View detailed consultation duration, pricing, and specialty categorizations.
-3. **Doctor Availability & Slot Generation:** Real-time generation of 30-min time slots accounting for working hours, breaks, and existing bookings.
-4. **Race-Condition-Free Booking Stepper:** 3-step checkout with instant conflict prevention.
-5. **Patient Dashboard:** Upcoming appointments, real-time status tracking (`Confirmed`, `Pending`, `Cancelled`, `Completed`), and one-click cancellation.
-6. **Custom In-App Admin Portal:** Live KPI metrics, appointments filter/status actions, full CRUD on Services, Doctors, and weekly Work Schedules.
+> **Tibbiyot markazlari, klinikalar va xizmat ko‘rsatish sohalari uchun ishlab chiqarishga tayyor (production-ready) shifokor qabuliga yozilish tizimi.**  
+> Loyiha **FastAPI (Clean Architecture & Repository Pattern)**, **SQLite (Asosiy ma'lumotlar bazasi)**, **Maxsus In-App React Admin Dashboard** hamda zamonaviy telemeditsina dizayniga ega **React (Vite)** texnologiyalarida yaratilgan.
 
 ---
 
-## 🏗 System Architecture (Clean Architecture)
+## 📸 Loyiha Haqida va Asosiy Imkoniyatlar
 
-The backend follows **Clean Architecture** and **Domain-Driven Design (DDD)** principles to separate concerns into decoupled layers:
+HealthPlus bemorlar va klinika ma'muriyati uchun to‘liq qulaylik yaratuvchi zamonaviy ekotizimdir:
+
+1. **Interaktiv Bosh Sahifa va Shifokorlarni Qidirish:** Shifokor mutaxassisligi, xizmat turi va kerakli sana bo‘yicha tezkor qidiruv hamda filtrlar.
+2. **Tibbiy Xizmatlar Katalogi:** Har bir xizmat narxi, qabul davomiyligi (30, 45, 60 daqiqa) va yo‘nalishlari bo‘yicha batafsil ma'lumot.
+3. **Ish Jadvali va Bo‘sh Vaqtlar (Slots) Generatsiyasi:** Shifokorning haftalik ish jadvali, tanaffus vaqtlari (Break time) va mavjud band vaqtlarini inobatga olgan holda real vaqt rejimida bo‘sh vaqtlarni shakllantirish.
+4. **Poyga Holatlaridan (Race Condition) Himoyalangan 3 Bosqichli Bron:** Bir nechta foydalanuvchi bir vaqtda bitta vaqtni tanlaganda to‘qnashuvlarni oldini oluvchi bron tizimi.
+5. **Bemor Shaxsiy Kabineti:** Kelgusi qabullar, o‘tgan ko‘riklar tarixi, real vaqt holati (`Tasdiqlangan`, `Kutilmoqda`, `Bekor qilingan`, `Yakunlangan`) va 1 ta tugma orqali bekor qilish imkoniyati.
+6. **Maxsus React Admin Dashboard:** 
+   - Jonli klinika KPI ko‘rsatkichlari (Umumiy tushum, jami qabullar, kutilayotgan ko‘riklar, faol shifokorlar va xizmatlar soni).
+   - 7 kunlik qabullar statistikasi va tahliliy grafiklar.
+   - Qabullarni bir martalik bosish orqali tasdiqlash, yakunlash yoki bekor qilish.
+   - Xizmatlar, Shifokorlar profillari va Haftalik ish jadvallari ustida to‘liq **CRUD** (yaratish, tahrirlash, o‘chirish) amallari.
+7. **Ko‘p Tillilik (i18n):** Butun platforma bo‘ylab O‘zbek (🇺🇿 UZ) va Ingliz (🇬🇧 EN) tillari o‘rtasida bir zumda almashtirish.
+
+---
+
+## 🏗 Tizim Arxitekturasi (Clean Architecture & DDD)
+
+Backend qismi **Clean Architecture** va **Domain-Driven Design (DDD)** qoidalariga asoslangan holda modulli va kengaytiriluvchan qatlamlarga ajratilgan:
 
 ```
 server/
 ├── app/
-│   ├── core/                  # Infrastructure configurations
-│   │   ├── config.py          # Environment settings (Pydantic Settings)
-│   │   ├── database.py        # SQLAlchemy engine & session factory
-│   │   └── security.py        # Bcrypt password hashing & JWT token handling
-│   ├── domain/                # Enterprise Business Rules & Entities
-│   │   └── models.py          # SQLAlchemy Models (User, Doctor, Service, Schedule, Booking)
-│   ├── schemas/               # Data Transfer Objects (Pydantic v2 validation)
+│   ├── core/                  # Infratuzilma va umumiy sozlamalar
+│   │   ├── config.py          # Muhit o'zgaruvchilari (Pydantic Settings)
+│   │   ├── database.py        # SQLAlchemy dvigateli va sessiyalar fabrikasi
+│   │   └── security.py        # Parollarni xeshirlash (Bcrypt) va JWT tokenlar
+│   ├── database/              # Ma'lumotlar bazasi modellari
+│   │   ├── models/            # SQLAlchemy modellar (User, Doctor, Service, Schedule, Booking)
+│   │   └── __init__.py
+│   ├── schemas/               # Ma'lumotlarni tekshirish va uzatish (Pydantic v2 DTO)
 │   │   ├── user.py
 │   │   ├── service.py
 │   │   ├── doctor.py
 │   │   ├── schedule.py
 │   │   └── booking.py
-│   ├── repositories/          # Data Access Layer (Repository Pattern)
-│   │   ├── base.py            # Generic BaseRepository with CRUD abstractions
+│   ├── repositories/          # Ma'lumotlarga kirish qatlami (Repository Pattern)
+│   │   ├── base.py            # Umumiy CRUD abstraksiyaga ega BaseRepository
 │   │   ├── user_repository.py
 │   │   ├── service_repository.py
 │   │   ├── doctor_repository.py
 │   │   ├── schedule_repository.py
-│   │   └── booking_repository.py  # Concurrency locking & slot overlap validation
-│   ├── services/              # Application Business Logic
-│   │   ├── auth_service.py    # Authentication, JWT issuance, password verification
-│   │   ├── booking_service.py # Slot calculation, conflict prevention, cancellation rules
-│   │   └── catalog_service.py # Services & doctors directory business rules
-│   ├── api/                   # Presentation Layer (FastAPI Routers)
-│   │   ├── deps.py            # Session injection & JWT role-based dependencies
+│   │   └── booking_repository.py  # Tranzaksiyaviy qulflash va to'qnashuvlarni tekshirish
+│   ├── services/              # Biznes mantiq qatlami (Application Logic)
+│   │   ├── auth_service.py    # Autentifikatsiya, JWT va xavfsizlik qoidalari
+│   │   ├── booking_service.py # Bo'sh slotlarni hisoblash, bekor qilish qoidalari
+│   │   └── catalog_service.py # Shifokorlar va xizmatlar katalogi boshqaruvi
+│   ├── api/                   # Taqdimot qatlami (FastAPI Marshrutlari)
+│   │   ├── deps.py            # Sessiyalar va JWT foydalanuvchi huquqlari inyeksiyasi
 │   │   ├── v1/
 │   │   │   ├── auth.py        # /auth/register, /auth/login, /auth/me
-│   │   │   ├── services.py    # /services catalog
-│   │   │   ├── doctors.py     # /doctors and /doctors/{id}/slots
-│   │   │   ├── bookings.py    # /bookings creation, cancellation, history
-│   │   │   └── admin.py       # /admin/metrics & live clinic management
-│   │   └── router.py          # Aggregated v1 router
-│   ├── admin/                 # Flask-Admin Integration
-│   │   └── flask_admin_app.py # ModelViews for Users, Doctors, Services, Schedules, Bookings
-│   ├── seed.py                # Database seeder with realistic test data & demo accounts
-│   └── main.py                # FastAPI ASGI entrypoint with mounted Flask WSGI app
-└── tests/                     # Comprehensive Pytest Suite
-    ├── conftest.py            # SQLite in-memory fixtures & mock client
-    ├── test_auth.py           # Registration & JWT verification tests
-    ├── test_services_doctors.py # Catalog & slot generation tests
-    ├── test_bookings.py       # Creation, retrieval & cancellation tests
-    └── test_race_condition.py # Concurrent double-booking prevention test
+│   │   │   ├── services.py    # Xizmatlar ro'yxati va filtrlash
+│   │   │   ├── doctors.py     # Shifokorlar va /doctors/{id}/slots
+│   │   │   ├── bookings.py    # Bron qilish, bekor qilish va qabullar tarixi
+│   │   │   └── admin.py       # Admin KPI metrikalari va boshqaruv API-lari
+│   │   └── router.py          # Barcha v1 yo'nalishlarini birlashtiruvchi router
+│   ├── seed.py                # O'zbekistonlik shifokorlar va sinov ma'lumotlari generatori
+│   └── main.py                # FastAPI ASGI asosiy kirish nuqtasi
+└── tests/                     # To'liq avtomatlashtirilgan Pytest to'plami
+    ├── conftest.py            # Xotirada ishlovchi SQLite bazasi va mock-mijoz
+    ├── test_auth.py           # Ro'yxatdan o'tish va JWT token testlari
+    ├── test_services_doctors.py # Katalog va slot generatsiyasi testlari
+    ├── test_bookings.py       # Bron yaratish, ko'rish va bekor qilish testlari
+    └── test_race_condition.py # Bir vaqtda tushgan parallel so'rovlar (Race condition) testi
 ```
 
 ---
 
-## ⚡ Concurrency & Race Conditions Handling
+## ⚡ Parallel So‘rovlar va Poyga Holatlari (Race Condition) Qanday Hal Qilingan?
 
-### "Ikki user bir xil vaqtda bir slotni booking qilsa nima bo'ladi?" (What happens if 2 users book the same slot simultaneously?)
+### ❓ "Ikki foydalanuvchi bir vaqtda bitta slotni bron qilsa nima yuz beradi?"
 
-When two users submit a reservation for Doctor $D$ at time $T$ at the exact same millisecond:
-1. **Row-Level Transaction Lock (`SELECT ... FOR UPDATE`):**
-   In `BookingRepository.create_booking_with_concurrency_lock`, the transaction acquires an exclusive row-level lock on the `Doctor` record in PostgreSQL:
+Agar ikki bemor bir millisekundda bitta shifokorning aynan bitta vaqtini band qilishga harakat qilsa:
+
+1. **Qator Darajasidagi Tranzaksiyaviy Qulf (`SELECT ... FOR UPDATE`):**
+   `BookingRepository.create_booking_with_concurrency_lock` funksiyasida tranzaksiya ochilganda, shifokor yozuvi bo‘yicha eksklyuziv qulflash o‘rnatiladi:
    ```python
-   # Locks the doctor row for the duration of the transaction
+   # Shifokor yozuvini tranzaksiya yakuniga qadar bloklaydi
    self.db.query(Doctor).filter(Doctor.id == booking.doctor_id).with_for_update().first()
    ```
-2. **Conflict Overlap Evaluation:**
-   While holding the lock, the system evaluates:
+
+2. **To‘qnashuvlarni Tekshirish (Overlap Evaluation):**
+   Qulf ushlab turilgan vaqtda baza quyidagi so‘rovni amalga oshiradi:
    ```sql
    SELECT id FROM bookings 
    WHERE doctor_id = :doc_id 
@@ -88,124 +97,127 @@ When two users submit a reservation for Doctor $D$ at time $T$ at the exact same
      AND start_time < :new_end 
      AND end_time > :new_start;
    ```
-3. **Deterministic Outcome:**
-   - **User A (first to acquire lock):** The check succeeds $\to$ appointment record is committed with status `Confirmed` $\to$ HTTP 200 OK.
-   - **User B (queued on lock):** Once User A commits, User B's lock is released. User B's transaction immediately sees User A's confirmed booking overlapping the slot $\to$ transaction rolls back $\to$ raises `SlotAlreadyBookedException` $\to$ returns **HTTP 409 Conflict** with a clear message:
-     > *"Selected slot (10:00 - 10:30) is no longer available. Another patient just booked it. Please choose another time."*
-4. **Database Safety Constraint:**
-   A composite index `(doctor_id, start_time)` ensures integrity at the database layer.
+
+3. **Aniq Natija:**
+   - **Birinchi foydalanuvchi:** Tekshiruvdan o‘tadi $\to$ bron `Confirmed` maqomida bazaga yoziladi $\to$ **HTTP 200 OK**.
+   - **Ikkinchi foydalanuvchi:** Birinchi tranzaksiya tugagandan so‘ng navbati keladi $\to$ tizim ushbu vaqt allaqachon band qilinganini ko‘radi $\to$ tranzaksiya bekor qilinadi (`rollback`) $\to$ **HTTP 409 Conflict** xatoligi qaytariladi:
+     > *"Tanlangan vaqt (10:00 - 10:30) band qilindi. Boshqa bemor hozirgina ushbu vaqtni band qildi. Iltimos, boshqa vaqtni tanlang."*
+
+4. **Ma'lumotlar Bazasi Darajasidagi Indekslar:**
+   Kombinatsiyalangan `(doctor_id, start_time)` indeksi baza darajasida ham yaxlitlikni kafolatlaydi.
 
 ---
 
-## 🛡 Handled Edge Cases
+## 🛡 Ko‘zda Tutilgan Chekka Holatlar (Edge Cases)
 
-| Edge Case | Solution |
-|-----------|----------|
-| **Simultaneous booking of same slot** | Row-level locking (`with_for_update`) + transactional isolation + HTTP 409 Conflict response. |
-| **Booking in the past** | Filtered out during available slot calculation (`start_time > now()`). |
-| **Booking during doctor break hours** | Doctors have defined `break_start` and `break_end` (e.g. 13:00 - 14:00). Break slots are excluded from availability. |
-| **Cancelling already completed visits** | `BookingService.cancel_booking` verifies status is not `Completed`; rejects invalid transitions with HTTP 400. |
-| **Unauthorized booking cancellation** | Patients can only cancel their own bookings; administrators can manage all bookings. |
-| **Variable service duration** | Slots are dynamically calculated using the specific service duration (30m, 45m, 60m). |
-
----
-
-## 🎛 Dual Admin Panels: Flask-Admin & React Dashboard
-
-### 1. Flask-Admin at `/admin`
-FastAPI mounts a WSGI Flask-Admin app using `a2wsgi.WSGIMiddleware`:
-```python
-flask_admin_app = create_flask_admin_app()
-app.mount("/admin", WSGIMiddleware(flask_admin_app))
-```
-- Direct relational database administration.
-- Search, filter, edit, delete, and view details on `Users`, `Doctors`, `Services`, `Schedules`, and `Bookings`.
-- Accessible at: **`http://localhost:8000/admin`**
-
-### 2. Modern React Admin Dashboard
-- Live clinic KPI metrics (Total Bookings, Confirmed, Pending, Cancelled, Revenue).
-- 7-day visual appointments trend chart.
-- Real-time booking approval/completion/cancellation table.
-- Accessible directly within the React web application at the **Admin Portal** tab.
+| Chekka Holat | Tizimdagi Yechimi |
+|---|---|
+| **Bir xil vaqtni bir nechta kishi bron qilishi** | Qator darajasidagi qulflash (`with_for_update`), tranzaksiya izolyatsiyasi va HTTP 409 javobi. |
+| **O‘tgan vaqtga bron qilish** | Bo‘sh vaqtlarni hisoblashda o‘tgan vaqtlar avtomatik filtrlanadi (`start_time > now()`). |
+| **Shifokorning tushlik/dam olish vaqtlari** | Har bir shifokor uchun `break_start` va `break_end` belgilangan; ushbu oraliqdagi vaqtlar ro‘yxatga kiritilmaydi. |
+| **Yakunlangan qabulni bekor qilishga urinish** | `BookingService` qabul holati `Completed` ekanligini tekshiradi va HTTP 400 xatosi bilan taqiqlaydi. |
+| **Begona bronni bekor qilishga urinish** | Oddiy bemor faqat o‘ziga tegishli bronlarni bekor qila oladi; barcha qabullarni faqat admin boshqara oladi. |
+| **Xizmat davomiyligining har xilligi** | Har bir xizmat davomiyligi (30 daqiqa, 45 daqiqa, 1 soat) bo‘yicha slotlar dinamik hisoblab chiqariladi. |
 
 ---
 
-## 🚀 Quickstart Instructions
+## 🎛 Maxsus In-App React Admin Dashboard
 
-### Option 1: Docker (Recommended)
-Make sure Docker Desktop is running, then execute:
+Tizimda barcha boshqaruv ishlari alohida qulay va zamonaviy **React Admin Paneli** orqali amalga oshiriladi:
+
+- **Boshqaruv Paneli (Overview):** Jami daromad, tasdiqlangan, kutilayotgan va bekor qilingan qabullar, so‘nggi yozilishlar ro‘yxati.
+- **Qabullar Bo‘limi (Appointments):** Maqomlar bo‘yicha tezkor saralash (`Barchasi`, `Kutilmoqda`, `Tasdiqlangan`, `Yakunlangan`, `Bekor qilingan`), qabullarni bir martalik bosish orqali boshqarish.
+- **Tibbiy Xizmatlar Bo‘limi (Services):** Yangi xizmat qo‘shish, narx va davomiylikni tahrirlash, xavfsiz o‘chirish (agar band qilingan bo‘lsa, faolsizlantiriladi).
+- **Shifokorlar Bo‘limi (Doctors & Staff):** Shifokorlar profili, mutaxassisliklari, qabul narxi va biografiyasini boshqarish.
+- **Ish Jadvallari Bo‘limi (Work Schedules):** Har bir shifokor uchun haftaning kunlari bo‘yicha ish boshlanishi, tugashi, tushlik vaqti va qabul oraliqlarini belgilash.
+
+---
+
+## 🚀 Loyihani Ishga Tushirish
+
+### 1-usul: Docker Compose Orqali (Tavsiya etiladi)
+
+Docker Desktop ishga tushirilganidan so‘ng quyidagi buyruqni bering:
 ```bash
 docker compose up --build
 ```
 - **React Frontend:** `http://localhost:3000`
-- **FastAPI API & Swagger Docs:** `http://localhost:8000/docs`
-- **Flask-Admin Panel:** `http://localhost:8000/admin`
+- **FastAPI Backend & Swagger Hujjatlari:** `http://localhost:8000/docs`
 
 ---
 
-### Option 2: Local Development Setup
+### 2-usul: Mahalliy Rivojlantirish (Local Development)
 
-#### Backend Setup:
+#### Backendni Ishga Tushirish:
 ```bash
 cd server
-uv sync # or: uv pip install -r requirements.txt
 
-# Run Alembic migrations:
+# Kerakli kutubxonalarni o'rnatish:
+uv sync   # yoki: pip install -r requirements.txt
+
+# Ma'lumotlar bazasi migratsiyalarini qo'llash:
 uv run alembic upgrade head
 
-# Run the FastAPI server:
+# FastAPI serverini ishga tushirish:
 uv run uvicorn app.main:app --reload --port 8000
 ```
+*Backend manzili: `http://localhost:8000` (API Swagger: `http://localhost:8000/docs`)*
+
+#### Frontendni Ishga Tushirish:
+```bash
+cd frontend
+
+# Kutubxonalarni o'rnatish:
+npm install
+
+# Vite ishlab chiquvchi serverini ishga tushirish:
+npm run dev
+```
+Brauzerda oching: **`http://localhost:5173`**
 
 ---
 
-## 🔄 Alembic Database Migrations
+## 🔄 Alembic Ma'lumotlar Bazasi Migratsiyalari
 
-Database schema migrations are version-controlled with Alembic:
+Bazadagi o‘zgarishlar versiyalar nazorati ostida Alembic orqali boshqariladi:
 ```bash
 cd server
 
-# Apply all migrations to the latest version:
+# Oxirgi migratsiyalarni bazaga qo'llash:
 uv run alembic upgrade head
 
-# Generate a new migration after editing SQLAlchemy models:
-uv run alembic revision --autogenerate -m "describe_schema_change"
+# Modellar o'zgarganda yangi migratsiya yaratish:
+uv run alembic revision --autogenerate -m "yangi_ozgarish_tavsifi"
 
-# Check the current database migration revision:
+# Joriy migratsiya holatini ko'rish:
 uv run alembic current
 
-# Rollback one migration step:
+# 1 qadam orqaga qaytarish:
 uv run alembic downgrade -1
 ```
 
-#### Frontend Setup:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open **`http://localhost:5173`** in your browser.
+---
+
+## 🔑 Tayyor Demo Hisoblar (Seed Data)
+
+Tizim dastlabki sinov uchun real tibbiy ma'lumotlar va shifokorlar bilan boyitilgan:
+
+| Rol | Elektron Pochta | Parol | Tavsif |
+|---|---|---|---|
+| **Bemor (Anasxon)** | `anasxon@healthplus.com` | `password123` | Faol va o‘tgan qabullarga ega namunaviy bemor |
+| **Klinika Administratori** | `admin@healthplus.com` | `admin123` | Barcha qabullar, shifokorlar va xizmatlarni boshqarish |
+| **Shifokor (Dr. Nodira Karimova)** | `nodira.karimova@healthplus.com` | `doctor123` | Oliy toifali terapevt, tayyor ish jadvaliga ega shifokor |
+
+*(Eslatma: Saytning kirish oynasida qulaylik uchun 1 ta bosish orqali hisoblarga tezkor kirish tugmalari mavjud!)*
 
 ---
 
-## 🔑 Demo Accounts (Pre-seeded)
+## 🧪 Avtomatlashtirilgan Testlar
 
-| Role | Email | Password | Details |
-|------|-------|----------|---------|
-| **Patient (Alex)** | `alex@healthplus.com` | `password123` | Patient from mockup with active & past appointments |
-| **Clinic Administrator** | `admin@healthplus.com` | `admin123` | Full access to React Admin & Flask-Admin |
-| **Doctor (Dr. Nodira Karimova)** | `nodira.karimova@healthplus.com` | `doctor123` | Umumiy amaliyot shifokori (General Practitioner) with pre-set schedules |
-
-*(Note: The login dialog features 1-click quick login buttons for Alex and Admin to allow instant evaluation without typing!)*
-
----
-
-## 🧪 Running Automated Tests
-
-Run the complete test suite including the concurrent race condition test:
+To‘liq sinov to‘plamini, jumladan parallel so‘rovlar (race condition) testini ishga tushirish:
 ```bash
 cd server
-uv run pytest -v
+PYTHONPATH=. uv run pytest -v
 ```
 
-All tests run in-memory with automatic schema setup and teardown.
+Barcha testlar in-memory rejimida ishlaydi va avtomatik ravishda toza holatda yakunlanadi.

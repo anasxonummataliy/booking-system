@@ -3,7 +3,7 @@ import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { ArrowLeft, Search, Star } from 'lucide-react';
 
-const SPECIALTIES = ['All', 'General', 'Cardiology', 'Dermatology', 'Pediatrics', 'Gynecology'];
+const SPECIALTIES = ['All', 'General', 'Cardiology', 'Dermatology', 'Pediatrics', 'Gynecology', 'Orthopedics'];
 
 export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty = 'All' }) {
   const { t } = useLanguage();
@@ -17,7 +17,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
       setLoading(true);
       try {
         const res = await api.getDoctors(selectedSpecialty);
-        setDoctors(res);
+        setDoctors(res || []);
       } catch (err) {
         console.error("Failed to load doctors:", err);
       } finally {
@@ -29,11 +29,41 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
 
   const filteredDoctors = doctors.filter(doc => {
     if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      doc.full_name.toLowerCase().includes(term) ||
-      doc.specialty.toLowerCase().includes(term)
-    );
+    const term = searchTerm.toLowerCase().trim();
+    const name = (doc.full_name || '').toLowerCase();
+    const spec = (doc.specialty || '').toLowerCase();
+    const serviceName = (doc.service?.name || '').toLowerCase();
+    const bio = (doc.bio || '').toLowerCase();
+
+    if (
+      name.includes(term) ||
+      spec.includes(term) ||
+      serviceName.includes(term) ||
+      bio.includes(term)
+    ) {
+      return true;
+    }
+
+    // Common multilingual keywords for cardiology, general checkup, etc.
+    const isCardio = term.includes('kardio') || term.includes('cardio') || term.includes('yurak');
+    if (isCardio && (spec.includes('kardiolog') || serviceName.includes('cardio'))) return true;
+
+    const isGeneral = term.includes('umumiy') || term.includes('terapevt') || term.includes('general');
+    if (isGeneral && (spec.includes('umumiy') || serviceName.includes('general'))) return true;
+
+    const isDerma = term.includes('derma') || term.includes('teri');
+    if (isDerma && (spec.includes('dermatolog') || serviceName.includes('derma'))) return true;
+
+    const isPediatric = term.includes('bolalar') || term.includes('pediatr');
+    if (isPediatric && (spec.includes('bolalar') || serviceName.includes('pediatr'))) return true;
+
+    const isGyneco = term.includes('ginekolog') || term.includes('gyneco') || term.includes('akusher') || term.includes('ayol');
+    if (isGyneco && (spec.includes('ginekolog') || serviceName.includes('gyneco'))) return true;
+
+    const isOrtho = term.includes('ortoped') || term.includes('travmatolog') || term.includes('ortho') || term.includes('suyak');
+    if (isOrtho && (spec.includes('ortoped') || serviceName.includes('ortho'))) return true;
+
+    return false;
   });
 
   const getSpecialtyLabel = (spec) => {
@@ -44,6 +74,7 @@ export default function DoctorsPage({ onBack, onSelectDoctor, initialSpecialty =
       case 'Dermatology': return t('specialtyDermatology');
       case 'Pediatrics': return t('specialtyPediatrics');
       case 'Gynecology': return t('specialtyGynecology');
+      case 'Orthopedics': return t('specialtyOrthopedics');
       default: return spec;
     }
   };

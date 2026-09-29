@@ -5,14 +5,12 @@ import {
   Phone, 
   Calendar, 
   ShieldCheck, 
-  Bell, 
   Globe, 
   Headphones, 
   LogOut, 
   ChevronRight, 
   ArrowLeft,
   CheckCircle2,
-  Clock,
   Edit2,
   Save,
   X
@@ -26,7 +24,6 @@ export default function ProfilePage({ onNavigate }) {
   const { t, language, setLanguage } = useLanguage();
 
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [phoneVal, setPhoneVal] = useState(user?.phone || '+998 90 123 45 67');
   const [phoneSuccess, setPhoneSuccess] = useState(false);
@@ -423,64 +420,7 @@ export default function ProfilePage({ onNavigate }) {
             </div>
           </div>
 
-          {/* Item 3: Notifications Switch */}
-          <div style={{
-            padding: '16px 18px',
-            borderBottom: '1px solid var(--border-light)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: '#FEF3C7',
-                color: '#D97706',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Bell size={18} />
-              </div>
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-main)' }}>
-                  {t('notifications')}
-                </h4>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {t('notificationsDesc')}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-              style={{
-                width: '46px',
-                height: '26px',
-                borderRadius: '13px',
-                backgroundColor: notificationsEnabled ? 'var(--primary)' : '#CBD5E1',
-                padding: '2px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{
-                width: '22px',
-                height: '22px',
-                borderRadius: '50%',
-                backgroundColor: '#FFFFFF',
-                transform: notificationsEnabled ? 'translateX(20px)' : 'translateX(0px)',
-                transition: 'transform 0.2s',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-              }} />
-            </button>
-          </div>
-
-          {/* Item 4: Security & 2FA */}
+          {/* Item 3: Security & 2FA */}
           <div 
             onClick={() => setSecurityModalOpen(true)}
             style={{
@@ -584,11 +524,10 @@ export default function ProfilePage({ onNavigate }) {
           <span>{t('navLogout')}</span>
         </button>
 
-        {/* Security & 2FA Modal */}
+        {/* Change Password Modal */}
         <SecurityModal
           isOpen={securityModalOpen}
           onClose={() => setSecurityModalOpen(false)}
-          user={user}
         />
 
       </div>

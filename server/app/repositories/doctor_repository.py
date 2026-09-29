@@ -1,7 +1,17 @@
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.database.models import Doctor
+from app.database.models import Doctor, Service
 from app.repositories.base import BaseRepository
+
+SPECIALTY_MAPPINGS = {
+    "cardiology": ["cardio", "kardiolog", "kardiologiya", "cardiology", "yurak"],
+    "general": ["general", "umumiy", "terapevt", "oilaviy", "checkup"],
+    "dermatology": ["dermatolog", "dermatologiya", "dermatology", "teri", "kosmetolog"],
+    "pediatrics": ["pediatr", "bolalar", "pediatriya", "pediatrics"],
+    "gynecology": ["ginekolog", "ginekologiya", "gynecology", "akusher", "ayollar"],
+    "orthopedics": ["ortoped", "travmatolog", "ortopediya", "orthopedics"],
+}
 
 
 class DoctorRepository(BaseRepository[Doctor]):
@@ -12,7 +22,18 @@ class DoctorRepository(BaseRepository[Doctor]):
         query = self.db.query(Doctor).options(joinedload(Doctor.service)).filter(Doctor.is_active)
 
         if specialty and specialty.lower() != "all":
-            query = query.filter(Doctor.specialty.ilike(f"%{specialty}%"))
+            spec_clean = specialty.lower().strip()
+            keywords = {spec_clean}
+            for group, terms in SPECIALTY_MAPPINGS.items():
+                if spec_clean == group or spec_clean in terms or any(t in spec_clean for t in terms):
+                    keywords.update(terms)
+
+            conds = []
+            for kw in keywords:
+                conds.append(Doctor.specialty.ilike(f"%{kw}%"))
+                conds.append(Service.name.ilike(f"%{kw}%"))
+
+            query = query.outerjoin(Doctor.service).filter(or_(*conds))
 
         return query.all()
 

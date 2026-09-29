@@ -69,6 +69,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             </p>
           </div>
           <button
+            id="auth-modal-close"
             onClick={onClose}
             style={{ color: 'var(--text-muted)', padding: '6px', borderRadius: '50%' }}
           >
@@ -89,6 +90,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           </span>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
             <button
+              id="demo-user-btn"
               type="button"
               onClick={() => handleDemo('user')}
               className="btn-secondary"
@@ -97,6 +99,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
               👤 User (Anasxon)
             </button>
             <button
+              id="demo-admin-btn"
               type="button"
               onClick={() => handleDemo('admin')}
               className="btn-secondary"
@@ -134,6 +137,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                 <div style={{ position: 'relative' }}>
                   <UserIcon size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
                   <input
+                    id="auth-fullname-input"
                     type="text"
                     required
                     value={fullName}
@@ -157,6 +161,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
                 <div style={{ position: 'relative' }}>
                   <Phone size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
                   <input
+                    id="auth-phone-input"
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -181,6 +186,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             <div style={{ position: 'relative' }}>
               <Mail size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
               <input
+                id="auth-email-input"
                 type="email"
                 required
                 value={email}
@@ -204,6 +210,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             <div style={{ position: 'relative' }}>
               <Lock size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
               <input
+                id="auth-password-input"
                 type="password"
                 required
                 value={password}
@@ -221,6 +228,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           </div>
 
           <button
+            id="auth-submit-btn"
             type="submit"
             disabled={loading}
             className="btn-primary"
@@ -235,6 +243,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             <>
               {t('dontHaveAccount')}{' '}
               <button
+                id="auth-switch-mode-btn"
                 type="button"
                 onClick={() => { setMode('register'); setError(''); }}
                 style={{ color: 'var(--primary)', fontWeight: 700 }}
@@ -246,6 +255,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
             <>
               {t('alreadyHaveAccount')}{' '}
               <button
+                id="auth-switch-mode-btn"
                 type="button"
                 onClick={() => { setMode('login'); setError(''); }}
                 style={{ color: 'var(--primary)', fontWeight: 700 }}

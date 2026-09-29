@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.database.models import Doctor, DoctorSchedule, Service
+from app.database.models import Booking, Doctor, DoctorSchedule, Service
 from app.repositories.doctor_repository import DoctorRepository
 from app.repositories.schedule_repository import ScheduleRepository
 from app.repositories.service_repository import ServiceRepository
@@ -39,8 +39,23 @@ class CatalogService:
         return self.service_repo.update(service)
 
     def delete_service(self, service_id: int) -> bool:
-        self.get_service(service_id)
-        return self.service_repo.delete(service_id)
+        service = self.get_service(service_id)
+        has_bookings = (
+            self.service_repo.db.query(Booking)
+            .filter(Booking.service_id == service_id)
+            .first()
+            is not None
+        )
+        if has_bookings:
+            service.is_active = False
+            self.service_repo.update(service)
+            return True
+        else:
+            self.doctor_repo.db.query(Doctor).filter(
+                Doctor.service_id == service_id
+            ).update({"service_id": None})
+            self.service_repo.db.commit()
+            return self.service_repo.delete(service_id)
 
     def list_doctors(self, specialty: str | None = None) -> list[Doctor]:
         return self.doctor_repo.get_all_with_service(specialty=specialty)
@@ -62,8 +77,23 @@ class CatalogService:
         return self.doctor_repo.update(doctor)
 
     def delete_doctor(self, doctor_id: int) -> bool:
-        self.get_doctor(doctor_id)
-        return self.doctor_repo.delete(doctor_id)
+        doctor = self.get_doctor(doctor_id)
+        has_bookings = (
+            self.doctor_repo.db.query(Booking)
+            .filter(Booking.doctor_id == doctor_id)
+            .first()
+            is not None
+        )
+        if has_bookings:
+            doctor.is_active = False
+            self.doctor_repo.update(doctor)
+            return True
+        else:
+            self.schedule_repo.db.query(DoctorSchedule).filter(
+                DoctorSchedule.doctor_id == doctor_id
+            ).delete()
+            self.doctor_repo.db.commit()
+            return self.doctor_repo.delete(doctor_id)
 
     def list_schedules(self, doctor_id: int) -> list[DoctorSchedule]:
         return self.schedule_repo.get_by_doctor(doctor_id)

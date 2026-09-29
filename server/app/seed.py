@@ -1,4 +1,9 @@
+import os
+import sys
 from datetime import date, datetime, time, timedelta
+
+# Ensure server/ is in python path when running app/seed.py directly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.core.security import hash_password
 from app.database import Base, SessionLocal, engine
@@ -394,10 +399,10 @@ def seed_database(force: bool = False):
     dr_shahnoza = doctors_map["Dr. Shahnoza Umarova"]
 
     bookings_data = [
-        # Alex's upcoming booking
+        # Anasxon's upcoming booking
         Booking(
             booking_reference="HP-2025-4891",
-            user_id=alex_user.id,
+            user_id=anasxon_user.id,
             doctor_id=dr_nodira.id,
             service_id=services_map["General Checkup"].id,
             start_time=datetime.combine(upcoming_date, time(10, 0)),
@@ -406,10 +411,10 @@ def seed_database(force: bool = False):
             total_price=30.0,
             notes="Muntazam yillik tibbiy ko'rik va qon bosimi nazorati.",
         ),
-        # Alex's past completed booking
+        # Anasxon's past completed booking
         Booking(
             booking_reference="HP-2025-3120",
-            user_id=alex_user.id,
+            user_id=anasxon_user.id,
             doctor_id=dr_alisher.id,
             service_id=services_map["Cardiology"].id,
             start_time=datetime.combine(past_date1, time(14, 30)),
@@ -418,10 +423,10 @@ def seed_database(force: bool = False):
             total_price=70.0,
             notes="EKG tahlili va kardiologiya konsultatsiyasi.",
         ),
-        # Alex's completed dermatology
+        # Anasxon's completed dermatology
         Booking(
             booking_reference="HP-2025-2415",
-            user_id=alex_user.id,
+            user_id=anasxon_user.id,
             doctor_id=dr_jasur.id,
             service_id=services_map["Dermatology"].id,
             start_time=datetime.combine(past_date2, time(11, 0)),
@@ -430,10 +435,10 @@ def seed_database(force: bool = False):
             total_price=50.0,
             notes="Teri allergiyasi va dermatoskopiya tekshiruvi.",
         ),
-        # Alex's cancelled appointment
+        # Anasxon's cancelled appointment
         Booking(
             booking_reference="HP-2025-1088",
-            user_id=alex_user.id,
+            user_id=anasxon_user.id,
             doctor_id=dr_shahnoza.id,
             service_id=services_map["Pediatrics"].id,
             start_time=datetime.combine(past_date3, time(9, 30)),

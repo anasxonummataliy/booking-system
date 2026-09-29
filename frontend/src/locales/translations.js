@@ -94,6 +94,7 @@ export const translations = {
     specialtyDermatology: 'Dermatologiya',
     specialtyPediatrics: 'Pediatriya',
     specialtyGynecology: 'Ginekologiya',
+    specialtyOrthopedics: 'Ortopediya',
     consultationFee: 'Qabul narxi',
     availableToday: 'Bugun qabul bor',
     noDoctorsFound: 'Ushbu parametrlar bo‘yicha shifokor topilmadi.',
@@ -217,7 +218,7 @@ export const translations = {
     paymentMethods: "To'lov usullari",
     paymentMethodsDesc: 'Karta va to‘lov tarixi',
     securitySettings: 'Xavfsizlik & Parol',
-    securitySettingsDesc: 'Parolni o‘zgartirish va 2FA',
+    securitySettingsDesc: 'Parolni o‘zgartirish va yangilash',
     helpSupport: 'Yordam va qo‘llab-quvvatlash',
     helpSupportDesc: '24/7 aloqa markazi: +998 71 200 00 00',
     appLanguage: 'Ilova tili',
@@ -227,9 +228,9 @@ export const translations = {
     logoutConfirm: 'Haqiqatan ham hisobdan chiqmoqchimisiz?',
     memberSince: "A'zo bo'lgan vaqti",
 
-    // Security & 2FA Modal
-    securityModalTitle: 'Xavfsizlik & 2FA sozlamalari',
-    securityModalSubtitle: 'Parolni yangilash va ikki bosqichli himoyani boshqarish',
+    // Security & Password Modal
+    securityModalTitle: 'Parolni o‘zgartirish',
+    securityModalSubtitle: 'Hisobingiz xavfsizligi uchun joriy parolingizni yangilang',
     changePasswordTab: 'Parolni o‘zgartirish',
     currentPassword: 'Joriy parol',
     currentPasswordPlaceholder: 'Hozirgi parolingizni kiriting',
@@ -343,6 +344,7 @@ export const translations = {
     specialtyDermatology: 'Dermatology',
     specialtyPediatrics: 'Pediatrics',
     specialtyGynecology: 'Gynecology',
+    specialtyOrthopedics: 'Orthopedics',
     consultationFee: 'Consultation Fee',
     availableToday: 'Available Today',
     noDoctorsFound: 'No doctors found matching the selected criteria.',
@@ -475,9 +477,9 @@ export const translations = {
     logoutConfirm: 'Are you sure you want to sign out?',
     memberSince: 'Member since',
 
-    // Security & 2FA Modal
-    securityModalTitle: 'Security & 2FA Settings',
-    securityModalSubtitle: 'Update password and manage two-factor authentication',
+    // Security & Password Modal
+    securityModalTitle: 'Change Password',
+    securityModalSubtitle: 'Update and strengthen your account credentials',
     changePasswordTab: 'Change Password',
     currentPassword: 'Current Password',
     currentPasswordPlaceholder: 'Enter your current password',
