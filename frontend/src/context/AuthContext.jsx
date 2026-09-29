@@ -48,7 +48,8 @@ export function AuthProvider({ children }) {
 
 
   // Quick 1-click Demo Switchers for convenience
-  const quickLoginAsAnasxon = () => login('anasxon@healthplus.com', 'password123');
+  const quickLoginAsPatient = () => login('anasxon@healthplus.com', 'password123');
+  const quickLoginAsDoctor = () => login('nodira.karimova@healthplus.com', 'doctor123');
   const quickLoginAsAdmin = () => login('admin@healthplus.com', 'admin123');
 
   return (
@@ -59,11 +60,14 @@ export function AuthProvider({ children }) {
         loading,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'admin',
+        isDoctor: user?.role === 'doctor',
         login,
         register,
         logout,
-        quickLoginAsAnasxon,
-        quickLoginAsAlex: quickLoginAsAnasxon,
+        quickLoginAsPatient,
+        quickLoginAsAnasxon: quickLoginAsPatient,
+        quickLoginAsAlex: quickLoginAsPatient,
+        quickLoginAsDoctor,
         quickLoginAsAdmin,
       }}
     >

@@ -20,7 +20,7 @@ import { useLanguage } from '../context/LanguageContext';
 import SecurityModal from '../components/SecurityModal';
 
 export default function ProfilePage({ onNavigate }) {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isDoctor } = useAuth();
   const { t, language, setLanguage } = useLanguage();
 
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
@@ -142,13 +142,13 @@ export default function ProfilePage({ onNavigate }) {
                 fontWeight: 700,
                 padding: '3px 12px',
                 borderRadius: 'var(--radius-full)',
-                backgroundColor: isAdmin ? '#EEF2FF' : '#ECFDF5',
-                color: isAdmin ? '#4338CA' : '#059669',
+                backgroundColor: isAdmin ? '#EEF2FF' : (isDoctor ? '#FEF3C7' : '#ECFDF5'),
+                color: isAdmin ? '#4338CA' : (isDoctor ? '#B45309' : '#059669'),
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px'
               }}>
-                {isAdmin ? `🛡️ ${t('adminRoleBadge')}` : `🩺 ${t('patientRoleBadge')}`}
+                {isAdmin ? `🛡️ ${t('adminRoleBadge')}` : (isDoctor ? `🩺 ${t('doctorRoleBadge')}` : `👤 ${t('patientRoleBadge')}`)}
               </span>
             </div>
 

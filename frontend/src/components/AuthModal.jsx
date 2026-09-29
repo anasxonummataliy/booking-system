@@ -5,7 +5,7 @@ import { X, Mail, Lock, User as UserIcon, Phone, AlertCircle } from 'lucide-reac
 import { formatErrorMessage } from '../utils/errorHandler';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSuccess }) {
-  const { login, register, quickLoginAsAnasxon, quickLoginAsAdmin } = useAuth();
+  const { login, register, quickLoginAsPatient, quickLoginAsAnasxon, quickLoginAsDoctor, quickLoginAsAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
   const [email, setEmail] = useState('');
@@ -40,8 +40,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
     setError('');
     setLoading(true);
     try {
-      if (type === 'user') {
-        await quickLoginAsAnasxon();
+      if (type === 'patient' || type === 'user') {
+        const fn = quickLoginAsPatient || quickLoginAsAnasxon;
+        await fn();
+      } else if (type === 'doctor') {
+        await quickLoginAsDoctor();
       } else if (type === 'admin') {
         await quickLoginAsAdmin();
       }
@@ -83,30 +86,82 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', onSu
           backgroundColor: '#F8FAFC',
           borderRadius: 'var(--radius-md)',
           padding: '12px 14px',
-          border: '1px dashed var(--border-light)',
+          border: '1px solid var(--border-light)',
           marginBottom: '20px'
         }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
-            {t('quickDemoButtons')}
-          </span>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
+              {t('quickDemoButtons')}
+            </span>
+            <span style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 600 }}>1-bosishda kirish</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
             <button
               id="demo-user-btn"
               type="button"
-              onClick={() => handleDemo('user')}
+              disabled={loading}
+              onClick={() => handleDemo('patient')}
               className="btn-secondary"
-              style={{ fontSize: '12px', padding: '9px 10px', justifyContent: 'center', fontWeight: 600 }}
+              style={{
+                fontSize: '12px',
+                padding: '10px 4px',
+                flexDirection: 'column',
+                gap: '2px',
+                justifyContent: 'center',
+                fontWeight: 600,
+                textAlign: 'center',
+                lineHeight: 1.2
+              }}
             >
-              👤 User (Anasxon)
+              <span style={{ fontSize: '14px' }}>👤</span>
+              <span>{t('demoUserBtn')}</span>
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 400 }}>Anasxon</span>
+            </button>
+            <button
+              id="demo-doctor-btn"
+              type="button"
+              disabled={loading}
+              onClick={() => handleDemo('doctor')}
+              className="btn-secondary"
+              style={{
+                fontSize: '12px',
+                padding: '10px 4px',
+                flexDirection: 'column',
+                gap: '2px',
+                justifyContent: 'center',
+                fontWeight: 600,
+                textAlign: 'center',
+                lineHeight: 1.2,
+                borderColor: '#FDE68A',
+                backgroundColor: '#FFFBEB'
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>🩺</span>
+              <span style={{ color: '#92400E' }}>{t('demoDoctorBtn')}</span>
+              <span style={{ fontSize: '10px', color: '#B45309', fontWeight: 400 }}>Dr. Nodira</span>
             </button>
             <button
               id="demo-admin-btn"
               type="button"
+              disabled={loading}
               onClick={() => handleDemo('admin')}
               className="btn-secondary"
-              style={{ fontSize: '12px', padding: '9px 10px', justifyContent: 'center', fontWeight: 600 }}
+              style={{
+                fontSize: '12px',
+                padding: '10px 4px',
+                flexDirection: 'column',
+                gap: '2px',
+                justifyContent: 'center',
+                fontWeight: 600,
+                textAlign: 'center',
+                lineHeight: 1.2,
+                borderColor: '#C7D2FE',
+                backgroundColor: '#EEF2FF'
+              }}
             >
-              🛠️ Admin
+              <span style={{ fontSize: '14px' }}>🛡️</span>
+              <span style={{ color: '#3730A3' }}>{t('demoAdminBtn')}</span>
+              <span style={{ fontSize: '10px', color: '#4338CA', fontWeight: 400 }}>Klinika</span>
             </button>
           </div>
         </div>

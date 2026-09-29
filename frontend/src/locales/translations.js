@@ -201,10 +201,10 @@ export const translations = {
     fullNamePlaceholder: 'To‘liq ism sharifingiz',
     phonePlaceholder: 'Telefon raqamingiz (+998...)',
     dontHaveAccount: 'Akkauntingiz yo‘qmi?',
-    alreadyHaveAccount: 'Akkauntingiz bormi?',
     quickDemoButtons: 'Tezkor test uchun demo akkauntlar:',
-    demoUserBtn: 'User (Anasxon)',
-    demoAdminBtn: 'Admin',
+    demoUserBtn: '👤 Bemor',
+    demoDoctorBtn: '🩺 Shifokor',
+    demoAdminBtn: '🛡️ Admin',
 
     // Profile Page
     profileTitle: 'Mening profilim',
@@ -453,8 +453,9 @@ export const translations = {
     dontHaveAccount: "Don't have an account?",
     alreadyHaveAccount: 'Already have an account?',
     quickDemoButtons: 'Quick 1-Click Demo Accounts:',
-    demoUserBtn: 'User (Anasxon)',
-    demoAdminBtn: 'Admin',
+    demoUserBtn: '👤 Patient',
+    demoDoctorBtn: '🩺 Doctor',
+    demoAdminBtn: '🛡️ Admin',
 
     // Profile Page
     profileTitle: 'My Profile',
@@ -473,6 +474,7 @@ export const translations = {
     helpSupportDesc: '24/7 call center: +998 71 200 00 00',
     appLanguage: 'App Language',
     patientRoleBadge: 'Patient',
+    doctorRoleBadge: 'Doctor',
     adminRoleBadge: 'Clinic Administrator',
     logoutConfirm: 'Are you sure you want to sign out?',
     memberSince: 'Member since',
