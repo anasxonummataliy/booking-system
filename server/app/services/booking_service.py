@@ -112,6 +112,13 @@ class BookingService:
         if not doctor or not doctor.is_active:
             raise HTTPException(status_code=404, detail="Doctor not found or inactive")
 
+        # Prevent self-booking: a doctor cannot book an appointment with themselves
+        if doctor.user_id is not None and doctor.user_id == user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Shifokor o'z profiliga qabulga yozila olmaydi / A doctor cannot book an appointment with themselves",
+            )
+
         service = self.service_repo.get(data.service_id)
         if not service or not service.is_active:
             raise HTTPException(status_code=404, detail="Service not found or inactive")

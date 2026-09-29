@@ -12,10 +12,11 @@ import DoctorsPage from './pages/DoctorsPage';
 import DoctorBookingPage from './pages/DoctorBookingPage';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
 import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isDoctor } = useAuth();
   const { t } = useLanguage();
   
   // Page navigation state: 'home' | 'services' | 'doctors' | 'doctor-booking' | 'dashboard' | 'profile' | 'admin'
@@ -43,6 +44,11 @@ function AppContent() {
       setActivePage('admin');
       return;
     }
+    if (isDoctor) {
+      alert("Shifokor hisobidan qabulga yozilish mumkin emas. Doctor Portal'dan foydalaning.");
+      setActivePage('doctor-portal');
+      return;
+    }
     setSelectedDoctor(doctor);
     setSelectedBookingDate(initialDate);
     setActivePage('doctor-booking');
@@ -60,6 +66,11 @@ function AppContent() {
   // If authenticated as admin, ONLY show AdminDashboard (no patient navbar/bottom nav/drawer)
   if (isAuthenticated && isAdmin) {
     return <AdminDashboard />;
+  }
+
+  // If authenticated as doctor, show DoctorDashboard
+  if (isAuthenticated && isDoctor) {
+    return <DoctorDashboard />;
   }
 
   return (

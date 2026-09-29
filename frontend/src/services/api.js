@@ -77,4 +77,18 @@ export const api = {
   deleteDoctor: (id) => request(`/doctors/${id}`, { method: 'DELETE' }),
   getDoctorSchedules: (id) => request(`/doctors/${id}/schedules`),
   setDoctorSchedule: (id, payload) => request(`/doctors/${id}/schedules`, { method: 'POST', body: JSON.stringify(payload) }),
+
+  // Doctor Portal (for logged-in doctor)
+  getDoctorPortalProfile: () => request('/doctor/me'),
+  getDoctorPortalBookings: (status) => {
+    const params = new URLSearchParams();
+    if (status && status !== 'All') params.append('status', status);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return request(`/doctor/bookings${qs}`);
+  },
+  updateDoctorPortalBookingStatus: (id, newStatus, reason) =>
+    request(`/doctor/bookings/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: newStatus, cancellation_reason: reason }),
+    }),
 };
