@@ -386,6 +386,11 @@ def seed_database(force: bool = False):
 
     db.commit()
 
+    # Link doctor user accounts to their Doctor records
+    if nodira_user and "Dr. Nodira Karimova" in doctors_map:
+        doctors_map["Dr. Nodira Karimova"].user_id = nodira_user.id
+        db.commit()
+
     # 4. Create Initial Demo Bookings with new doctors
     today = date.today()
     upcoming_date = today + timedelta(days=2)
