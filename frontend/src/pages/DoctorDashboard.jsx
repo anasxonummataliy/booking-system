@@ -3,409 +3,1074 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatDateTime } from '../utils/dateFormatter';
+import { formatErrorMessage } from '../utils/errorHandler';
 import {
-  Stethoscope, Calendar, Clock, CheckCircle, XCircle, LogOut,
-  Search, Users, Star, Activity, AlertCircle, RefreshCw, Menu, ChevronDown,
+  LayoutDashboard,
+  Calendar,
+  UserCheck,
+  Clock,
+  Search,
+  TrendingUp,
+  DollarSign,
+  Users,
+  LogOut,
+  X,
+  Stethoscope,
+  Menu,
+  Plus
 } from 'lucide-react';
-
-const STATUS_COLORS = {
-  Pending:   { bg: '#fef3c7', text: '#92400e', dot: '#f59e0b' },
-  Confirmed: { bg: '#d1fae5', text: '#065f46', dot: '#10b981' },
-  Cancelled: { bg: '#fee2e2', text: '#991b1b', dot: '#ef4444' },
-  Completed: { bg: '#dbeafe', text: '#1e40af', dot: '#3b82f6' },
-};
-
-const STATUS_LABELS_UZ = {
-  Pending: 'Kutilmoqda', Confirmed: 'Tasdiqlangan',
-  Cancelled: 'Bekor qilingan', Completed: 'Yakunlangan',
-};
-
-function StatusBadge({ status }) {
-  const c = STATUS_COLORS[status] || { bg: '#f3f4f6', text: '#374151', dot: '#6b7280' };
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      background: c.bg, color: c.text,
-      borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600,
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.dot, display: 'inline-block' }} />
-      {STATUS_LABELS_UZ[status] || status}
-    </span>
-  );
-}
-
-function StatCard({ icon: Icon, label, value, color, sub }) {
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)',
-      borderRadius: 16, padding: '20px 22px', border: '1px solid rgba(255,255,255,0.1)',
-      display: 'flex', flexDirection: 'column', gap: 8,
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      cursor: 'default',
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.25)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: 0, fontWeight: 500 }}>{label}</p>
-          <p style={{ color: '#fff', fontSize: 28, fontWeight: 700, margin: '4px 0 0' }}>{value}</p>
-          {sub && <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '2px 0 0' }}>{sub}</p>}
-        </div>
-        <div style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: `${color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Icon size={20} color={color} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ActionBtn({ onClick, loading, color, icon, label, outline }) {
-  return (
-    <button onClick={onClick} disabled={loading} style={{
-      display: 'flex', alignItems: 'center', gap: 6,
-      padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-      cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s', opacity: loading ? 0.6 : 1,
-      background: outline ? 'transparent' : color,
-      border: outline ? `1.5px solid ${color}` : 'none',
-      color: outline ? color : '#fff',
-    }}>
-      {icon}{loading ? '...' : label}
-    </button>
-  );
-}
-
-function BookingCard({ booking: b, isLoading, onConfirm, onComplete, onCancel }) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',
-      borderRadius: 14, overflow: 'hidden',
-    }}>
-      <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }}
-        onClick={() => setExpanded(p => !p)}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 10,
-          background: 'linear-gradient(135deg, #10b981, #059669)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontWeight: 700, fontSize: 15, flexShrink: 0,
-        }}>
-          {(b.user?.full_name || 'B')[0].toUpperCase()}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>{b.user?.full_name || "Noma'lum bemor"}</span>
-            <StatusBadge status={b.status} />
-          </div>
-          <div style={{ display: 'flex', gap: 16, marginTop: 3, flexWrap: 'wrap' }}>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>📅 {formatDateTime(b.start_time)}</span>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>🔖 {b.booking_reference}</span>
-            <span style={{ color: '#10b981', fontSize: 12, fontWeight: 600 }}>${b.total_price}</span>
-          </div>
-        </div>
-        <ChevronDown size={16} color="rgba(255,255,255,0.3)"
-          style={{ transform: expanded ? 'rotate(180deg)' : '', transition: 'transform 0.2s', flexShrink: 0 }} />
-      </div>
-      {expanded && (
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '14px 18px' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 12 }}>
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 2px' }}>Xizmat</p>
-              <p style={{ color: '#fff', fontSize: 13, margin: 0 }}>{b.service?.name || '—'}</p>
-            </div>
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 2px' }}>Telefon</p>
-              <p style={{ color: '#fff', fontSize: 13, margin: 0 }}>{b.user?.phone || '—'}</p>
-            </div>
-            {b.notes && (
-              <div style={{ width: '100%' }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 2px' }}>Eslatma</p>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, margin: 0 }}>{b.notes}</p>
-              </div>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {b.status === 'Pending' && (
-              <ActionBtn onClick={onConfirm} loading={isLoading} color="#10b981" icon={<CheckCircle size={14} />} label="Tasdiqlash" />
-            )}
-            {b.status === 'Confirmed' && (
-              <ActionBtn onClick={onComplete} loading={isLoading} color="#3b82f6" icon={<Activity size={14} />} label="Yakunlash" />
-            )}
-            {b.status !== 'Cancelled' && b.status !== 'Completed' && (
-              <ActionBtn onClick={onCancel} loading={isLoading} color="#ef4444" icon={<XCircle size={14} />} label="Bekor qilish" outline />
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DoctorCard({ doctor: doc, isMe }) {
-  return (
-    <div style={{
-      background: isMe ? 'linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.08))' : 'rgba(255,255,255,0.05)',
-      border: isMe ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.09)',
-      borderRadius: 14, padding: '18px 16px',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-    >
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-        <div style={{
-          width: 46, height: 46, borderRadius: 12, flexShrink: 0,
-          background: isMe ? 'linear-gradient(135deg,#10b981,#059669)' : 'linear-gradient(135deg,#6366f1,#4f46e5)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontWeight: 700, fontSize: 18, overflow: 'hidden',
-        }}>
-          {doc.avatar_url
-            ? <img src={doc.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : doc.full_name[0]}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <p style={{ color: '#fff', fontSize: 14, fontWeight: 700, margin: 0 }}>{doc.full_name}</p>
-            {isMe && <span style={{ background: '#10b981', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>SIZ</span>}
-          </div>
-          <p style={{ color: '#10b981', fontSize: 12, margin: '2px 0 6px', fontWeight: 500 }}>{doc.specialty}</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>⭐ {doc.rating}</span>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>🏥 {doc.experience_years} yil</span>
-          </div>
-        </div>
-      </div>
-      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ color: doc.is_active ? '#10b981' : '#f87171', fontSize: 11, fontWeight: 600, background: doc.is_active ? 'rgba(16,185,129,0.1)' : 'rgba(248,113,113,0.1)', padding: '2px 8px', borderRadius: 20 }}>
-          {doc.is_active ? '● Faol' : '● Nofaol'}
-        </span>
-        <span style={{ color: '#f59e0b', fontSize: 12, fontWeight: 600 }}>${doc.consultation_fee}</span>
-      </div>
-    </div>
-  );
-}
 
 export default function DoctorDashboard({ onNavigate }) {
   const { user, logout } = useAuth();
-  const { language, setLanguage } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
 
+  // Active tab: 'overview' | 'bookings' | 'doctors'
+  const [activeTab, setActiveTab] = useState('overview');
+  const [doctorDrawerOpen, setDoctorDrawerOpen] = useState(false);
+
+  // Data states
   const [doctorProfile, setDoctorProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [doctors, setDoctors] = useState([]);
+
+  // Filter & Search states
   const [filterStatus, setFilterStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('bookings');
   const [actionLoadingId, setActionLoadingId] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true); setError(null);
+  const loadAllData = async () => {
     try {
-      const [profile, myBookings, allDoctors] = await Promise.all([
+      const [profile, b, d] = await Promise.all([
         api.getDoctorPortalProfile(),
         api.getDoctorPortalBookings(filterStatus === 'All' ? undefined : filterStatus),
-        api.getDoctors(),
+        api.getDoctors()
       ]);
       setDoctorProfile(profile?.error ? null : profile);
-      setBookings(myBookings || []);
-      setDoctors(allDoctors || []);
+      setBookings(b || []);
+      setDoctors(d || []);
     } catch (err) {
-      setError(err.message || "Ma'lumotlarni yuklashda xato");
-    } finally {
-      setLoading(false);
+      console.error("Failed to load doctor data:", err);
     }
+  };
+
+  useEffect(() => {
+    loadAllData();
   }, [filterStatus]);
 
-  useEffect(() => { loadData(); }, [loadData]);
-
-  const handleStatusUpdate = async (bookingId, newStatus, reason) => {
+  // Status update
+  const handleUpdateStatus = async (bookingId, newStatus) => {
     setActionLoadingId(bookingId);
     try {
-      await api.updateDoctorPortalBookingStatus(bookingId, newStatus, reason);
-      await loadData();
+      await api.updateDoctorPortalBookingStatus(bookingId, newStatus);
+      const b = await api.getDoctorPortalBookings(filterStatus === 'All' ? undefined : filterStatus);
+      setBookings(b || []);
     } catch (err) {
-      alert(err.message || 'Xato yuz berdi');
+      alert(formatErrorMessage(err, language));
     } finally {
       setActionLoadingId(null);
     }
   };
 
-  const stats = {
-    total: bookings.length,
-    pending: bookings.filter(b => b.status === 'Pending').length,
-    confirmed: bookings.filter(b => b.status === 'Confirmed').length,
-    completed: bookings.filter(b => b.status === 'Completed').length,
+  const renderBadge = (status) => {
+    switch (status) {
+      case 'Confirmed':
+        return <span className="badge badge-confirmed">{t('statusConfirmed')}</span>;
+      case 'Completed':
+        return <span className="badge badge-completed">{t('statusCompleted')}</span>;
+      case 'Cancelled':
+        return <span className="badge badge-cancelled">{t('statusCancelled')}</span>;
+      default:
+        return <span className="badge badge-pending">{t('statusPending')}</span>;
+    }
   };
 
+  const formatDate = (dateStr) => formatDateTime(dateStr, language);
+
   const filteredBookings = bookings.filter(b => {
+    if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return !q || b.booking_reference?.toLowerCase().includes(q) || b.user?.full_name?.toLowerCase().includes(q);
+    return (
+      b.user?.full_name?.toLowerCase().includes(q) ||
+      b.service?.name?.toLowerCase().includes(q) ||
+      b.booking_reference?.toLowerCase().includes(q)
+    );
   });
 
-  const sidebarNavItem = (active) => ({
-    display: 'flex', alignItems: 'center', gap: 10,
-    padding: '10px 20px', margin: '2px 10px', borderRadius: 10,
-    cursor: 'pointer', transition: 'all 0.2s',
-    background: active ? 'linear-gradient(135deg,#10b981,#059669)' : 'transparent',
-    color: active ? '#fff' : 'rgba(255,255,255,0.6)',
-    fontWeight: active ? 600 : 400, fontSize: 14,
-    border: 'none', textAlign: 'left', width: 'calc(100% - 20px)',
-  });
+  const pendingCount = bookings.filter(b => b.status === 'Pending').length;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%)', fontFamily: "'Inter',-apple-system,sans-serif", display: 'flex' }}>
-      {drawerOpen && <div onClick={() => setDrawerOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, backdropFilter: 'blur(4px)' }} />}
-
-      {/* Sidebar */}
-      <aside style={{
-        width: 250, background: 'rgba(255,255,255,0.04)', borderRight: '1px solid rgba(255,255,255,0.08)',
-        display: 'flex', flexDirection: 'column', padding: '24px 0',
-        position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', flexShrink: 0,
+    <div className="admin-layout-root" style={{ height: '100vh' }}>
+      {/* Dedicated Doctor Header - identical structure to AdminDashboard header */}
+      <header style={{
+        backgroundColor: '#0B132B',
+        color: '#FFFFFF',
+        padding: '12px 20px',
+        borderBottom: '1px solid #1E293B',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        flexShrink: 0,
+        boxShadow: 'var(--shadow-sm)'
       }}>
-        <div style={{ padding: '0 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#10b981,#059669)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Stethoscope size={18} color="#fff" />
-            </div>
-            <div>
-              <p style={{ color: '#fff', fontSize: 14, fontWeight: 700, margin: 0 }}>Doctor Portal</p>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: 0 }}>Health Plus</p>
-            </div>
+        {/* Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            backgroundColor: 'var(--primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
+          }}>
+            <Plus size={20} color="#FFFFFF" strokeWidth={3} />
           </div>
-          {doctorProfile && (
-            <div style={{ marginTop: 12, padding: '10px 12px', background: 'rgba(16,185,129,0.1)', borderRadius: 10, border: '1px solid rgba(16,185,129,0.2)' }}>
-              <p style={{ color: '#10b981', fontSize: 12, fontWeight: 600, margin: '0 0 2px' }}>{doctorProfile.full_name}</p>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, margin: 0 }}>{doctorProfile.specialty}</p>
-              <div style={{ display: 'flex', gap: 4, marginTop: 4, alignItems: 'center' }}>
-                <Star size={11} color="#f59e0b" fill="#f59e0b" />
-                <span style={{ color: '#f59e0b', fontSize: 11, fontWeight: 600 }}>{doctorProfile.rating}</span>
-              </div>
-            </div>
-          )}
+          <div>
+            <span style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+              Health<span style={{ color: '#38BDF8' }}>Plus</span>
+            </span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              color: '#10B981',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              marginLeft: '8px',
+              letterSpacing: '0.6px'
+            }}>
+              {language === 'uz' ? 'Shifokor portali' : 'Doctor Portal'}
+            </span>
+          </div>
         </div>
 
-        <nav style={{ flex: 1, padding: '8px 0' }}>
-          {[{ id: 'bookings', label: 'Mening qabullarim', Icon: Calendar }, { id: 'doctors', label: "Shifokorlar ro'yxati", Icon: Users }].map(({ id, label, Icon }) => (
-            <button key={id} onClick={() => { setActiveTab(id); setDrawerOpen(false); }} style={sidebarNavItem(activeTab === id)}>
-              <Icon size={16} />{label}
+        {/* Right Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Language Switcher */}
+          <div style={{
+            display: 'flex',
+            backgroundColor: '#1E293B',
+            borderRadius: 'var(--radius-full)',
+            padding: '2px'
+          }}>
+            <button
+              id="doctor-lang-uz"
+              onClick={() => setLanguage('uz')}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '11px',
+                fontWeight: language === 'uz' ? 700 : 500,
+                backgroundColor: language === 'uz' ? 'var(--primary)' : 'transparent',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                border: 'none'
+              }}
+            >
+              🇺🇿 UZ
             </button>
-          ))}
-        </nav>
+            <button
+              id="doctor-lang-en"
+              onClick={() => setLanguage('en')}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '11px',
+                fontWeight: language === 'en' ? 700 : 500,
+                backgroundColor: language === 'en' ? 'var(--primary)' : 'transparent',
+                color: '#FFFFFF',
+                cursor: 'pointer',
+                border: 'none'
+              }}
+            >
+              🇬🇧 EN
+            </button>
+          </div>
 
-        <div style={{ padding: '16px 10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <button onClick={() => setLanguage(language === 'uz' ? 'en' : 'uz')} style={{ ...sidebarNavItem(false), width: '100%', marginBottom: 4 }}>
-            🌐 {language === 'uz' ? 'English' : "O'zbek"}
+          {/* Doctor User Chip (Desktop) */}
+          <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 10px', backgroundColor: '#1E293B', borderRadius: 'var(--radius-full)' }}>
+            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#059669', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700 }}>
+              {(user?.full_name || 'Doctor')[0].toUpperCase()}
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#F1F5F9' }}>
+              {user?.full_name || 'Doctor'}
+            </span>
+          </div>
+
+          {/* Logout (Desktop) */}
+          <button
+            id="doctor-logout-btn"
+            onClick={() => logout()}
+            className="desktop-only"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              backgroundColor: '#EF4444',
+              color: '#FFFFFF',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              border: 'none',
+              boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)'
+            }}
+          >
+            <LogOut size={14} />
+            <span>{t('navLogout')}</span>
           </button>
-          <button onClick={logout} style={{ ...sidebarNavItem(false), width: '100%', color: '#f87171' }}>
-            <LogOut size={16} />Chiqish
+
+          {/* Mobile Hamburger Button */}
+          <button
+            id="doctor-mobile-menu-btn"
+            onClick={() => setDoctorDrawerOpen(true)}
+            className="mobile-only"
+            style={{
+              padding: '6px',
+              borderRadius: 'var(--radius-md)',
+              color: '#FFFFFF',
+              backgroundColor: '#1E293B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+            aria-label="Open doctor menu"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Animated Doctor Drawer */}
+      {doctorDrawerOpen && (
+        <div className="mobile-drawer-overlay" onClick={() => setDoctorDrawerOpen(false)}>
+          <div className="mobile-drawer-content" onClick={e => e.stopPropagation()}>
+            {/* Drawer Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #1E293B'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Plus size={20} color="#FFFFFF" strokeWidth={3} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+                    Health<span style={{ color: '#38BDF8' }}>Plus</span>
+                  </span>
+                  <span style={{
+                    fontSize: '9px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10B981',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                    marginLeft: '6px'
+                  }}>
+                    {language === 'uz' ? 'Shifokor' : 'Doctor'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                id="doctor-drawer-close"
+                onClick={() => setDoctorDrawerOpen(false)}
+                style={{
+                  color: '#94A3B8',
+                  backgroundColor: '#1E293B',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Doctor Profile Card */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              backgroundColor: '#1E293B',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: '#059669',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '15px'
+              }}>
+                {(user?.full_name || 'Doctor')[0].toUpperCase()}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.full_name || 'Doctor'}
+                </div>
+                <div style={{ fontSize: '11px', color: '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {doctorProfile?.specialty || user?.email || ''}
+                </div>
+              </div>
+            </div>
+
+            {/* Doctor Navigation Tabs */}
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                { id: 'overview', label: language === 'uz' ? "Umumiy ko'rinish" : 'Overview', icon: LayoutDashboard },
+                { id: 'bookings', label: language === 'uz' ? 'Mening qabullarim' : 'My Appointments', icon: Calendar, count: bookings.length },
+                { id: 'doctors', label: language === 'uz' ? "Shifokorlar ro'yxati" : 'Doctors', icon: Users, count: doctors.length }
+              ].map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    id={`drawer-doctor-tab-${tab.id}`}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setDoctorDrawerOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+                      padding: '12px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: '15px',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#FFFFFF' : '#94A3B8',
+                      backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                      textAlign: 'left',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Icon size={19} />
+                    <span style={{ flex: 1 }}>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#1E293B',
+                        color: isActive ? '#FFFFFF' : '#94A3B8',
+                        padding: '2px 8px',
+                        borderRadius: '12px'
+                      }}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Language Switcher in Drawer */}
+            <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #1E293B' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.8px' }}>
+                {t('language')}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  id="drawer-doctor-lang-uz"
+                  onClick={() => setLanguage('uz')}
+                  style={{
+                    padding: '8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '13px',
+                    fontWeight: language === 'uz' ? 700 : 500,
+                    color: language === 'uz' ? '#FFFFFF' : '#94A3B8',
+                    backgroundColor: language === 'uz' ? 'var(--primary)' : '#1E293B',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🇺🇿 O'zbekcha
+                </button>
+                <button
+                  id="drawer-doctor-lang-en"
+                  onClick={() => setLanguage('en')}
+                  style={{
+                    padding: '8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '13px',
+                    fontWeight: language === 'en' ? 700 : 500,
+                    color: language === 'en' ? '#FFFFFF' : '#94A3B8',
+                    backgroundColor: language === 'en' ? 'var(--primary)' : '#1E293B',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🇬🇧 English
+                </button>
+              </div>
+            </div>
+
+            {/* Logout at bottom */}
+            <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+              <button
+                id="drawer-doctor-logout-btn"
+                onClick={() => {
+                  logout();
+                  setDoctorDrawerOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '12px 14px',
+                  color: '#EF4444',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <LogOut size={18} />
+                <span>{t('navLogout')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Horizontal Tabs Selector */}
+      <div className="mobile-only admin-mobile-tabs">
+        {[
+          { id: 'overview', label: language === 'uz' ? "Umumiy" : 'Overview', icon: LayoutDashboard },
+          { id: 'bookings', label: language === 'uz' ? 'Qabullar' : 'Bookings', icon: Calendar, count: bookings.length },
+          { id: 'doctors', label: language === 'uz' ? 'Shifokorlar' : 'Doctors', icon: Users, count: doctors.length }
+        ].map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              id={`mobile-doctor-tab-${tab.id}`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`admin-mobile-tab-btn ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+              {tab.count !== undefined && (
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : '#E2E8F0',
+                  color: isActive ? '#FFFFFF' : 'var(--text-main)',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  marginLeft: '2px'
+                }}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Doctor Content Area (Sidebar + Workspace) */}
+      <div className="admin-body-container">
+        {/* Desktop Sidebar - identical structure to Admin */}
+        <aside className="desktop-only admin-desktop-sidebar">
+        <div>
+          {/* Sidebar Section Heading */}
+          <div style={{ padding: '4px 12px 14px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#64748B' }}>
+            {language === 'uz' ? 'Shifokor portali' : 'Doctor Portal'}
+          </div>
+
+          {/* Navigation Tabs */}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              id="doctor-tab-overview"
+              onClick={() => setActiveTab('overview')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '14px',
+                fontWeight: activeTab === 'overview' ? 700 : 500,
+                color: activeTab === 'overview' ? '#FFFFFF' : '#94A3B8',
+                backgroundColor: activeTab === 'overview' ? 'var(--primary)' : 'transparent',
+                textAlign: 'left',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <LayoutDashboard size={18} />
+              <span>{language === 'uz' ? "Umumiy ko'rinish" : 'Overview'}</span>
+            </button>
+
+            <button
+              id="doctor-tab-bookings"
+              onClick={() => setActiveTab('bookings')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '14px',
+                fontWeight: activeTab === 'bookings' ? 700 : 500,
+                color: activeTab === 'bookings' ? '#FFFFFF' : '#94A3B8',
+                backgroundColor: activeTab === 'bookings' ? 'var(--primary)' : 'transparent',
+                textAlign: 'left',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Calendar size={18} />
+              <span>{language === 'uz' ? 'Barcha qabullar' : 'All Bookings'}</span>
+              {pendingCount > 0 && (
+                <span style={{
+                  marginLeft: 'auto',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  padding: '2px 7px',
+                  borderRadius: '10px'
+                }}>
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              id="doctor-tab-doctors"
+              onClick={() => setActiveTab('doctors')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '14px',
+                fontWeight: activeTab === 'doctors' ? 700 : 500,
+                color: activeTab === 'doctors' ? '#FFFFFF' : '#94A3B8',
+                backgroundColor: activeTab === 'doctors' ? 'var(--primary)' : 'transparent',
+                textAlign: 'left',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <UserCheck size={18} />
+              <span>{language === 'uz' ? "Shifokorlar ro'yxati" : 'Doctors List'}</span>
+              <span style={{ marginLeft: 'auto', color: '#64748B', fontSize: '12px' }}>{doctors.length}</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Doctor user info & Logout */}
+        <div style={{ flexShrink: 0, paddingTop: '16px', borderTop: '1px solid #1E293B' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: '#059669',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '14px',
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(5, 150, 105, 0.4)',
+              flexShrink: 0
+            }}>
+              {(user?.full_name || 'Doctor')[0].toUpperCase()}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {user?.full_name || 'Doctor'}
+              </div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {user?.email || 'doctor@healthplus.uz'}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => logout()}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 10px',
+              borderRadius: 'var(--radius-sm)',
+              color: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: 'none',
+              width: '100%',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <LogOut size={15} /> {t('navLogout')}
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <main style={{ flex: 1, padding: '28px 32px', overflowY: 'auto' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+      {/* Main Doctor Workspace */}
+      <main className="admin-workspace">
+
+        {/* Header Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '14px' }}>
           <div>
-            <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 700, margin: 0 }}>
-              Xush kelibsiz, Dr. {doctorProfile?.full_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || ''}! 👋
+            <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+              {activeTab === 'overview' && (language === 'uz' ? "Umumiy ko'rinish" : 'Overview')}
+              {activeTab === 'bookings' && (language === 'uz' ? 'Barcha qabullar' : 'All Bookings')}
+              {activeTab === 'doctors' && (language === 'uz' ? "Shifokorlar ro'yxati" : 'Doctors List')}
             </h1>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, margin: '3px 0 0' }}>
-              {new Date().toLocaleDateString('uz-UZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
+              {language === 'uz'
+                ? "Sizga kelgan qabullarni boshqarish va shifokorlar ro'yxatini ko'rish"
+                : 'Manage your appointments and view colleagues'}
             </p>
           </div>
-          <button onClick={loadData} disabled={loading} style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 10, padding: '8px 14px', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 500,
-          }}>
-            <RefreshCw size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-            Yangilash
-          </button>
         </div>
 
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <AlertCircle size={16} color="#ef4444" />
-            <span style={{ color: '#ef4444', fontSize: 14 }}>{error}</span>
-          </div>
-        )}
-
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16, marginBottom: 28 }}>
-          <StatCard icon={Calendar} label="Jami qabullar" value={stats.total} color="#3b82f6" />
-          <StatCard icon={Clock} label="Kutilmoqda" value={stats.pending} color="#f59e0b" sub="Tasdiqlash kerak" />
-          <StatCard icon={CheckCircle} label="Tasdiqlangan" value={stats.confirmed} color="#10b981" />
-          <StatCard icon={Activity} label="Yakunlangan" value={stats.completed} color="#8b5cf6" />
-        </div>
-
-        {/* Bookings Tab */}
-        {activeTab === 'bookings' && (
+        {/* TAB 1: OVERVIEW */}
+        {activeTab === 'overview' && (
           <div>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 18 }}>
-              <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
-                <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)' }} />
-                <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Bemor ismi yoki kod..."
-                  style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: '#fff', padding: '9px 12px 9px 36px', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+            {/* KPI Summary Cards */}
+            <div className="kpi-grid-4">
+              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '22px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>{language === 'uz' ? 'Umumiy tushum' : 'Revenue'}</span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <DollarSign size={18} />
+                  </div>
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
+                  ${(bookings.filter(b => b.status === 'Confirmed' || b.status === 'Completed').reduce((acc, curr) => acc + (curr.total_price || curr.service?.price || 30), 0)).toLocaleString()}
+                </div>
+                <div style={{ fontSize: '12px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <TrendingUp size={14} /> {language === 'uz' ? 'Tasdiqlangan va yakunlangan' : 'Confirmed & completed'}
+                </div>
               </div>
-              {['All', 'Pending', 'Confirmed', 'Completed', 'Cancelled'].map(s => (
-                <button key={s} onClick={() => setFilterStatus(s)} style={{
-                  padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
-                  background: filterStatus === s ? 'linear-gradient(135deg,#10b981,#059669)' : 'rgba(255,255,255,0.06)',
-                  border: filterStatus === s ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                  color: filterStatus === s ? '#fff' : 'rgba(255,255,255,0.6)',
-                }}>
-                  {s === 'All' ? 'Barchasi' : STATUS_LABELS_UZ[s] || s}
+
+              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '22px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>{language === 'uz' ? 'Jami qabullar' : 'Total Appointments'}</span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#EFF6FF', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Calendar size={18} />
+                  </div>
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
+                  {bookings.length}
+                </div>
+                <div style={{ fontSize: '12px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <TrendingUp size={14} /> {language === 'uz' ? 'Barcha bronlar' : 'All bookings'}
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '22px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>{t('statusPending')}</span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Clock size={18} />
+                  </div>
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#D97706', marginBottom: '4px' }}>
+                  {pendingCount}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                  {language === 'uz' ? 'Tasdiq kutilmoqda' : 'Awaiting confirmation'}
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '22px', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>{language === 'uz' ? "Shifokorlar ro'yxati" : 'Doctors'}</span>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F3E8FF', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Users size={18} />
+                  </div>
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '4px' }}>
+                  {doctors.length}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 500 }}>
+                  {doctors.filter(d => d.is_active).length} {language === 'uz' ? 'faol shifokor' : 'active doctors'}
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Bookings Quick Table */}
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
+              <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)' }}>
+                <div>
+                  <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-main)' }}>{language === 'uz' ? 'Barcha bronlar ro\'yxati' : 'Booking List'}</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{language === 'uz' ? 'So\'nggi bron qilingan qabullar' : 'Recent patient appointments'}</p>
+                </div>
+                <button
+                  id="doctor-overview-view-all-btn"
+                  onClick={() => setActiveTab('bookings')}
+                  className="btn-secondary"
+                  style={{ fontSize: '12px', padding: '6px 14px' }}
+                >
+                  {language === 'uz' ? "Barchasini ko'rish" : 'View All'} &rarr;
                 </button>
-              ))}
-            </div>
+              </div>
 
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.4)' }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid rgba(16,185,129,0.3)', borderTopColor: '#10b981', animation: 'spin 1s linear infinite', margin: '0 auto 12px' }} />
-                Yuklanmoqda...
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('patientName')}</th>
+                      <th style={{ padding: '14px 20px', fontWeight: 700 }}>{language === 'uz' ? 'Xizmat' : 'Service'}</th>
+                      <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('dateTime')}</th>
+                      <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('status')}</th>
+                      <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('actions')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookings.slice(0, 5).map(b => (
+                      <tr key={b.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                        <td style={{ padding: '14px 20px', fontWeight: 700, color: 'var(--text-main)' }}>
+                          {b.user?.full_name || 'Patient'}
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>{b.booking_reference}</div>
+                        </td>
+                        <td style={{ padding: '14px 20px', color: 'var(--text-muted)' }}>
+                          {b.service?.name}
+                        </td>
+                        <td style={{ padding: '14px 20px', color: 'var(--text-muted)' }}>
+                          {formatDate(b.start_time)}
+                        </td>
+                        <td style={{ padding: '14px 20px' }}>
+                          {renderBadge(b.status)}
+                        </td>
+                        <td style={{ padding: '14px 20px' }}>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {b.status === 'Pending' && (
+                              <button
+                                id={`doctor-overview-confirm-${b.id}`}
+                                onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
+                                disabled={actionLoadingId === b.id}
+                                className="btn-primary"
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px' }}
+                              >
+                                {t('confirm')}
+                              </button>
+                            )}
+                            {b.status === 'Confirmed' && (
+                              <button
+                                id={`doctor-overview-complete-${b.id}`}
+                                onClick={() => handleUpdateStatus(b.id, 'Completed')}
+                                disabled={actionLoadingId === b.id}
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
+                              >
+                                {t('statusCompleted')}
+                              </button>
+                            )}
+                            {(b.status === 'Completed' || b.status === 'Cancelled') && (
+                              <span style={{ fontSize: '13px', color: '#94A3B8' }}>—</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : filteredBookings.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 0', background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
-                <Calendar size={40} color="rgba(255,255,255,0.2)" style={{ marginBottom: 12 }} />
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, margin: 0 }}>Hozircha qabullar mavjud emas</p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {filteredBookings.map(b => (
-                  <BookingCard key={b.id} booking={b} isLoading={actionLoadingId === b.id}
-                    onConfirm={() => handleStatusUpdate(b.id, 'Confirmed')}
-                    onComplete={() => handleStatusUpdate(b.id, 'Completed')}
-                    onCancel={() => {
-                      const reason = window.prompt('Bekor qilish sababini kiriting:');
-                      if (reason !== null) handleStatusUpdate(b.id, 'Cancelled', reason);
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* Doctors Tab */}
+        {/* TAB 2: BOOKINGS MANAGEMENT */}
+        {activeTab === 'bookings' && (
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
+            <div className="admin-card-header">
+              {/* Search bar */}
+              <div style={{ position: 'relative', width: '280px', maxWidth: '100%', flex: '1 1 220px' }}>
+                <Search size={16} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
+                <input
+                  id="doctor-bookings-search-input"
+                  type="text"
+                  placeholder={language === 'uz' ? 'Qidirish (bemor, xizmat)...' : 'Search patient, service...'}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px 8px 36px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-light)',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+
+              {/* Status filter pills */}
+              <div
+                className="filter-pills-scroll"
+                style={{
+                  display: 'flex',
+                  gap: '4px',
+                  alignItems: 'center',
+                  overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  maxWidth: '100%',
+                  minWidth: 0,
+                  paddingBottom: '2px'
+                }}
+              >
+                {['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled'].map(st => {
+                  const label = st === 'All' ? t('filterAll') : (
+                    st === 'Confirmed' ? t('statusConfirmed') : (
+                      st === 'Pending' ? t('statusPending') : (
+                        st === 'Completed' ? t('statusCompleted') : t('statusCancelled')
+                      )
+                    )
+                  );
+                  return (
+                    <button
+                      key={st}
+                      id={`doctor-filter-${st.toLowerCase()}`}
+                      onClick={() => setFilterStatus(st)}
+                      className={`pill-filter ${filterStatus === st ? 'active' : ''}`}
+                      style={{
+                        fontSize: '10.5px',
+                        padding: '5px 8px',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)', fontSize: '12px', textTransform: 'uppercase' }}>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('patientName')}</th>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{language === 'uz' ? 'Xizmat' : 'Service'}</th>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('dateTime')}</th>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('price')}</th>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('status')}</th>
+                    <th style={{ padding: '14px 20px', fontWeight: 700 }}>{t('actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBookings.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                        {t('noBookingsYet')}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredBookings.map(b => (
+                      <tr key={b.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                        <td style={{ padding: '16px 20px', fontWeight: 700, color: 'var(--text-main)' }}>
+                          {b.user?.full_name || 'Patient'}
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>{b.booking_reference}</div>
+                        </td>
+                        <td style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>
+                          {b.service?.name}
+                        </td>
+                        <td style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>
+                          {formatDate(b.start_time)}
+                        </td>
+                        <td style={{ padding: '16px 20px', fontWeight: 700, color: 'var(--text-main)' }}>
+                          ${b.total_price || b.service?.price || 30}
+                        </td>
+                        <td style={{ padding: '16px 20px' }}>
+                          {renderBadge(b.status)}
+                        </td>
+                        <td style={{ padding: '16px 20px' }}>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {b.status === 'Pending' && (
+                              <button
+                                id={`doctor-confirm-booking-${b.id}`}
+                                onClick={() => handleUpdateStatus(b.id, 'Confirmed')}
+                                disabled={actionLoadingId === b.id}
+                                className="btn-primary"
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px' }}
+                              >
+                                {t('confirm')}
+                              </button>
+                            )}
+                            {b.status === 'Confirmed' && (
+                              <button
+                                id={`doctor-complete-booking-${b.id}`}
+                                onClick={() => handleUpdateStatus(b.id, 'Completed')}
+                                disabled={actionLoadingId === b.id}
+                                style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700, border: '1px solid #A7F3D0' }}
+                              >
+                                {t('statusCompleted')}
+                              </button>
+                            )}
+                            {(b.status === 'Pending' || b.status === 'Confirmed') && (
+                              <button
+                                id={`doctor-cancel-booking-${b.id}`}
+                                onClick={() => handleUpdateStatus(b.id, 'Cancelled')}
+                                disabled={actionLoadingId === b.id}
+                                className="btn-danger-outline"
+                                style={{ padding: '4px 10px', fontSize: '12px' }}
+                              >
+                                {t('cancel')}
+                              </button>
+                            )}
+                            {(b.status === 'Completed' || b.status === 'Cancelled') && (
+                              <span style={{ fontSize: '13px', color: '#94A3B8' }}>—</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: DOCTORS LIST (read-only) */}
         {activeTab === 'doctors' && (
-          <div>
-            <div style={{ marginBottom: 18 }}>
-              <h2 style={{ color: '#fff', fontSize: 18, fontWeight: 700, margin: '0 0 4px' }}>Barcha shifokorlar ro'yxati</h2>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, margin: 0 }}>Klinikamizning barcha mutaxassislari</p>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 16 }}>
-              {doctors.map(doc => <DoctorCard key={doc.id} doctor={doc} isMe={doctorProfile?.id === doc.id} />)}
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+            {doctors.map(doc => (
+              <div key={doc.id} style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: 'var(--radius-lg)',
+                padding: '24px',
+                border: doctorProfile?.id === doc.id ? '2px solid #059669' : '1px solid var(--border-light)',
+                boxShadow: 'var(--shadow-sm)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative'
+              }}>
+                {/* "SIZ" badge */}
+                {doctorProfile?.id === doc.id && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    backgroundColor: '#059669',
+                    color: '#FFFFFF',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    {language === 'uz' ? 'SIZ' : 'YOU'}
+                  </div>
+                )}
+
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+                    <div style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '14px',
+                      backgroundColor: doctorProfile?.id === doc.id ? '#059669' : '#EFF6FF',
+                      color: doctorProfile?.id === doc.id ? '#FFFFFF' : 'var(--primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px',
+                      fontWeight: 800,
+                      overflow: 'hidden',
+                      flexShrink: 0
+                    }}>
+                      {doc.avatar_url
+                        ? <img src={doc.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : doc.full_name[0]
+                      }
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '2px' }}>
+                        {doc.full_name}
+                      </h3>
+                      <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 600 }}>
+                        {doc.specialty}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '16px' }}>
+                    {doc.bio?.substring(0, 120)}{doc.bio?.length > 120 ? '...' : ''}
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderTop: '1px solid var(--border-light)', marginBottom: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>{language === 'uz' ? 'Tajriba' : 'Experience'}</span>
+                      <strong style={{ fontSize: '15px', color: 'var(--text-main)' }}>{doc.experience_years} {language === 'uz' ? 'yil' : 'years'}</strong>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>{language === 'uz' ? 'Reyting' : 'Rating'}</span>
+                      <strong style={{ fontSize: '15px', color: '#F59E0B' }}>⭐ {doc.rating}</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>{t('price')}</span>
+                      <strong style={{ fontSize: '18px', color: 'var(--primary)' }}>${doc.consultation_fee}</strong>
+                    </div>
+                  </div>
+
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    padding: '4px 10px',
+                    borderRadius: '12px',
+                    backgroundColor: doc.is_active ? '#ECFDF5' : '#F3F4F6',
+                    color: doc.is_active ? '#059669' : '#6B7280'
+                  }}>
+                    {doc.is_active ? (language === 'uz' ? 'Faol' : 'Active') : (language === 'uz' ? 'Nofaol' : 'Inactive')}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
+
       </main>
-      <style>{`@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }`}</style>
+      </div>
     </div>
   );
 }
