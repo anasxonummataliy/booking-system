@@ -20,7 +20,7 @@ def test_create_and_get_booking(client, test_user_token, test_doctor, test_servi
     assert response.status_code == 200
     booking = response.json()
     assert booking["doctor_id"] == test_doctor.id
-    assert booking["status"] == "Confirmed"
+    assert booking["status"] == "Pending"
     assert booking["booking_reference"].startswith("HP-")
 
     # Verify in my appointments

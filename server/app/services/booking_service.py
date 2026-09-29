@@ -137,7 +137,7 @@ class BookingService:
             service_id=service.id,
             start_time=start_time,
             end_time=end_time,
-            status=BookingStatus.CONFIRMED.value,
+            status=BookingStatus.PENDING.value,
             total_price=total_price,
             notes=data.notes,
         )

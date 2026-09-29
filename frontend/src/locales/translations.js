@@ -124,8 +124,8 @@ export const translations = {
     adminCannotBookBanner: "Admin hisobidan qabulga yozilish taqiqlangan",
 
     // Confirmation Modal
-    confirmedSuccessTitle: 'Qabul muvaffaqiyatli band qilindi!',
-    confirmedSuccessSubtitle: 'Qabul tasdiqlandi. Shifokor sizni belgilangan vaqtda kutadi.',
+    confirmedSuccessTitle: 'Arizangiz muvaffaqiyatli qabul qilindi!',
+    confirmedSuccessSubtitle: 'Qabulingiz kutilmoqda holatida qabul qilindi. Tez orada admin yoki shifokor tomonidan tasdiqlanadi.',
     bookingReference: 'Bron raqami',
     viewMyAppointmentsBtn: 'Mening qabullarimga o‘tish',
     bookAnotherBtn: 'Yana qabulga yozilish',
@@ -374,8 +374,8 @@ export const translations = {
     adminCannotBookBanner: "Admins cannot book appointments",
 
     // Confirmation Modal
-    confirmedSuccessTitle: 'Appointment Confirmed!',
-    confirmedSuccessSubtitle: 'Your booking has been recorded. The doctor will see you at the scheduled time.',
+    confirmedSuccessTitle: 'Appointment Request Received!',
+    confirmedSuccessSubtitle: 'Your booking has been submitted and is pending confirmation by the doctor or clinic administrator.',
     bookingReference: 'Booking Reference',
     viewMyAppointmentsBtn: 'View My Appointments',
     bookAnotherBtn: 'Book Another Appointment',

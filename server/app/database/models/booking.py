@@ -26,7 +26,7 @@ class Booking(Base):
     start_time: Mapped[datetime] = mapped_column(DateTime, index=True, nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     status: Mapped[str] = mapped_column(
-        String(50), default=BookingStatus.CONFIRMED.value, nullable=False
+        String(50), default=BookingStatus.PENDING.value, nullable=False
     )
     total_price: Mapped[float] = mapped_column(Float, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
